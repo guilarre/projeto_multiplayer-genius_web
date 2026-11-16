@@ -1,11 +1,12 @@
-// TEST:
-function escreverNaTela() {
-    const tela = document.querySelector("#container svg tspan");
-    tela.textContent = 'oiiiii';
-}
+// SECTION: constantes
 
-const botaoTeste = document.querySelector("button");
+const MAX_LEDS = 4;
+const MAX_PLAYERS = 4;
+const MAX_SEQUENCIA = 12;
+const PONTO_POR_ACERTO = 100;
+const STRING_BUFFER_SIZE = 100;
+const TEMPO_LED_ACESO = 400;
 
-if (botaoTeste) {
-    botaoTeste.addEventListener('click', escreverNaTela);
-}
+// SECTION: enums, structs e classes
+
+

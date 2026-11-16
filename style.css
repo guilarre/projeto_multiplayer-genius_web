@@ -16,9 +16,30 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    /* NOTE: pra mobile: evita que o usuário selecione acidentalmente textos na interface ao tocar rápido */
+    user-select: none;
+    -webkit-user-select: none;
+    /* NOTE: Remove o atraso de 300ms de clique em navegadores mobile antigos */
+    touch-action: manipulation;
 }
 
 #container svg {
     margin: 0 auto;
     width: 100%;
+    max-width: 400px;
+    height: auto;
+}
+
+svg tspan {
+    color: var(--text-color);
+}
+
+#azul-aceso, #amarelo-aceso, #vermelho-aceso, #verde-aceso {
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.1s ease-in-out;
+}
+
+#azul-aceso.ativo, #amarelo-aceso.ativo, #vermelho-aceso.ativo, #verde-aceso.ativo {
+    opacity: 1;
 }
