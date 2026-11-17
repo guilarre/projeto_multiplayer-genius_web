@@ -187,7 +187,7 @@ function terminarJogo() {
 }
 
 function delayComPausa(tempoMs) {
-
+    
 }
 
 function verificarBotaoMenu() {
@@ -202,15 +202,26 @@ function menuSetup() {
 }
 
 // menu pausa
-function menuPausa() {
+async function menuPausa() {
+    let opcaoSelecionada = 1; //opção inicial na tela
 
+    printaString(menuPausaMsgs, 0, 0);
+    printaString(menuPausaMsgs, opcaoSelecionada, 0);
+
+    // TODO: loop até confirmação:: n pode usar while (true)
 }
 
-function setup() {
+function gameSetup() {
+    menuSetup();
+    newRandomColor();
 
+    for (let i = 1; i < 5; i++) {
+        printaString(msgsSistema, i, 1);
+        delayComPausa(1000); // TODO:
+    }
 }
 
-function loop() {
+function gameLoop() {
 
 }
 
