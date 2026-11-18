@@ -1,7 +1,15 @@
+/* SECTION: variáveis */
+
 :root {
     --bg-color: #383838;
     --text-color: #ffffff;
+    --bg-pausa: rgba(0, 0, 0, 0.70);
+    --modal-bg: #151C27;
+    --modal-border: #303A49;
+    --li-hover: rgba(255, 255, 255, 0.4);
 }
+
+/* SECTION: setup global */
 
 * {
     box-sizing: border-box;
@@ -16,30 +24,107 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    /* NOTE: pra mobile: evita que o usuário selecione acidentalmente textos na interface ao tocar rápido */
+    /* pra mobile: evita que o usuário selecione acidentalmente textos na interface ao tocar rápido */
     user-select: none;
     -webkit-user-select: none;
-    /* NOTE: Remove o atraso de 300ms de clique em navegadores mobile antigos */
+    /* remove o atraso de 300ms de clique em navegadores mobile antigos */
     touch-action: manipulation;
 }
 
-#container svg {
+/* SECTION: svg do jogo */
+
+/* componente do jogo em si */
+#game-container svg {
     margin: 0 auto;
     width: 100%;
     max-width: 400px;
     height: auto;
 }
 
-svg tspan {
+/* texto do 'display' */
+#controle-central tspan {
     color: var(--text-color);
 }
 
+/* componentes dos botões acesos no svg */
+
 #azul-aceso, #amarelo-aceso, #vermelho-aceso, #verde-aceso {
     opacity: 0;
-    cursor: pointer;
     transition: opacity 0.1s ease-in-out;
 }
 
 #azul-aceso.ativo, #amarelo-aceso.ativo, #vermelho-aceso.ativo, #verde-aceso.ativo {
     opacity: 1;
+}
+
+/* nossos botões: quadrantes INTEIROS (envolvendo também os tspans) */ 
+
+#quadrante-azul, #quadrante-amarelo, #quadrante-vermelho, #quadrante-verde {
+    cursor: pointer;
+}
+
+/* texto dos botões (qtd de players a serem selecionados) */
+
+#quadrante-azul text, #quadrante-amarelo text, #quadrante-vermelho text, #quadrante-verde text {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#quadrante-azul text.ativo, #quadrante-amarelo text.ativo, #quadrante-vermelho text.ativo, #quadrante-verde text.ativo {
+    opacity: 1;
+}
+
+/* SECTION: componentes do modal de pausa */
+
+#btn-pausa {
+    cursor: pointer;
+}
+
+#modal-pausa {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-pausa);
+    /* inicia centralizando no meio da tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    /* esconde qnd começa o jogo */
+    display: none;
+}
+
+#modal-pausa ul {
+    background-color: var(--modal-bg);
+    border: 2px solid var(--modal-border);
+    padding: 20px 40px;
+    list-style: none;
+    border-radius: 8px; /* CHECK: */
+    text-align: center;
+}
+
+#modal-pausa h2 {
+    color: var(--text-color);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#modal-pausa li {
+    color: var(--text-color);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+#modal-pausa li:hover {
+    color: var(--li-hover);
+}
+
+#modal-pausa.ativo {
+    display: flex;
 }

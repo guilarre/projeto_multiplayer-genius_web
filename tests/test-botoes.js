@@ -28,7 +28,7 @@ function solicitarApagarBotao(botao) {
     botao.dataset.timeoutId = String(timeoutId);
 }
 
-arrayBotoes.forEach(function(botao) {
+arrayBotoes.forEach((botao) => {
     // qnd user clica
     botao.addEventListener('pointerdown', () => acenderBotao(botao));
     // qnd user libera click
