@@ -136,10 +136,10 @@ function retirarPlayerEIterar() {
 // função pra funcionar como o delay() do arduino
 //  NOTE: (função que chamar ela deve usar await e deve ser async)
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-// retorna promise pra liberar await 
+// trava da thread do jogo quando precisar pausar
 function aguardarDespausar() {
     return new Promise((resolve) => {
-        resolverDespause = resolve;
+        resolverDespause = resolve; //guarda a função resolve dentro de resolverDespause
     });
 }
 // nosso delayComPausa() (delay não bloqueante) pra substituir o sleep()
@@ -225,7 +225,7 @@ btnPausa.addEventListener('pointerdown', async () => {
 
     if (acao === 'VOLTAR') {
         if (resolverDespause) {
-            resolverDespause(); //libera o await resolverDespause
+            resolverDespause(); //libera a trava de resolverDespause
             resolverDespause = null;
         }
     } else if (acao === 'REINICIAR') {
@@ -276,8 +276,10 @@ function printaString(arrayMsg, idx, displayY) {
 }
 // função pra resetar jogo
 async function resetJogo() {
-    // desativa partida
+    // desativa vars e flags de partida e pausa
     partidaAtiva = false;
+    jogoPausado = false;
+    resolverDespause = null;
     // reseta sequenciaAtualGlobal e tentativaAtualGlobal
     sequenciaAtualGlobal = [];
     tentativaAtualGlobal = [];
@@ -291,7 +293,7 @@ async function resetJogo() {
     // msg confirmando que resetou tudo
     printaString(msgsSistema, 0, 0); //Reiniciando...
     display[1].textContent = "";
-    await sleep(2000); //tempo na tela
+    await sleep(1000); //tempo na tela
 
     // chama setup novamente...
     await setupJogo();
@@ -482,3 +484,5 @@ async function loopJogo() {
 
 // chamando nossa função de entrada
 setupJogo();
+
+// TODO: ajeitar o botão de pausa
