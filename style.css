@@ -50,7 +50,7 @@ body {
 
 #azul-aceso, #amarelo-aceso, #vermelho-aceso, #verde-aceso {
     opacity: 0;
-    transition: opacity 0.1s ease-in-out;
+    transition: opacity 0.1s ease-in-out; /* animação */
 }
 
 #azul-aceso.ativo, #amarelo-aceso.ativo, #vermelho-aceso.ativo, #verde-aceso.ativo {
@@ -67,7 +67,7 @@ body {
 
 #quadrante-azul text, #quadrante-amarelo text, #quadrante-vermelho text, #quadrante-verde text {
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out; /* animação */
 }
 
 #quadrante-azul text.ativo, #quadrante-amarelo text.ativo, #quadrante-vermelho text.ativo, #quadrante-verde text.ativo {

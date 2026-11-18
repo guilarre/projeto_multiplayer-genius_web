@@ -1,10 +1,9 @@
 // SECTION: constantes e classes
 
 // config geral
-const MAX_BOTOES = 4; // CHECK: precisa ainda disso?
 const MAX_PLAYERS = 4;
 const MAX_SEQUENCIA = 12;
-const PONTO_POR_ACERTO = 100;
+const PONTO_POR_ACERTO = 100; // CHECK: ver se mantem em 100
 const TEMPO_LED_ACESO = 400;
 const TEMPO_LED_APAGADO = 200;
 
@@ -76,20 +75,16 @@ const playerList = [
 ];
 
 // SECTION: strings pros menus e mensagens
-// TODO: remover as que não usaremos e ajeitar no código
 
-// cores
-const corToString = ["AZUL", "AMARELO", "VERMELHO", "VERDE"];
 // menuSetup()
-const menuSetupMsgs = [" --  Escolha  --", "1 jogador", "2 jogadores", "3 jogadores", "4 jogadores", "-- Confirmado --", " qtd de players "];
-// menuPausa()
-const menuPausaMsgs = ["--   PAUSA   --", "Voltar", "Placar atual", "Reiniciar jogo", "Terminar jogo"];
+const menuSetupMsgs = [" --  Escolha  --", " 1 jogador", " 2 jogadores", " 3 jogadores", " 4 jogadores", "-- Confirmado --", " qtd de players "];
 // de quem é a vez atual
-const vezAtualMsgs = ["-- Player 1 --", "-- Player 2 --", "-- Player 3 --", "-- Player 4 --"];
+const vezAtualMsgs = [" -- Player 1 --", " -- Player 2 --", " -- Player 3 --", " -- Player 4 --"];
+// TODO: remover se n for usar
 // mostrarPlacar()
-const pontuacaoMsgs = ["P1: ", "P2: ", "P3: ", "P4: "];
+const pontuacaoMsgs = [" P1: ", " P2: ", " P3: ", " P4: "];
 // msgs do sistema
-const msgsSistema = ["Reiniciando...", "3...", "2...", "1...", "START!", "ERROU!", "ACERTOU!", "VOCÊ GANHOU!", "O JOGO ACABOU!"];
+const msgsSistema = [" Reiniciando...", " 3...", " 2...", " 1...", " START!", " ERROU!", " ACERTOU!", " VOCÊ GANHOU!", " O JOGO ACABOU!"];
 
 // SECTION: vars globais
 
@@ -139,9 +134,9 @@ function retirarPlayerEIterar() {
 // SECTION: funções para sleep, pausa, modal de pausa, etc.
 
 // função pra funcionar como o delay() do arduino
-//  NOTE: (função que chamar ela deve ser async)
+//  NOTE: (função que chamar ela deve usar await e deve ser async)
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-// TODO: comentario
+// retorna promise pra liberar await 
 function aguardarDespausar() {
     return new Promise((resolve) => {
         resolverDespause = resolve;
@@ -221,19 +216,20 @@ btnPausa.addEventListener('pointerdown', async () => {
     // não pausa se já estiver pausado ou se estiver no menu inicial
     if (jogoPausado || !partidaAtiva) return;
 
+    // flag pausa
     jogoPausado = true;
-
+    // recebe ação desejada
     const acao = await menuPausa();
-
+    // seta flag de volta
     jogoPausado = false;
 
     if (acao === 'VOLTAR') {
         if (resolverDespause) {
-            resolverDespause();
+            resolverDespause(); //libera o await resolverDespause
             resolverDespause = null;
         }
     } else if (acao === 'REINICIAR') {
-        partidaController?.abort(); // interrompe o loopJogo atual
+        partidaController?.abort(); //interrompe o loopJogo atual
         if (resolverDespause) resolverDespause();
         await resetJogo();
     } else if (acao === 'TERMINAR') {
@@ -331,7 +327,7 @@ function solicitarApagarBotao(botao) {
 // função pra mostrar sequência atual de cores
 async function mostrarSequenciaGlobal() {
     for (const cor of sequenciaAtualGlobal) {
-        if (partidaController?.signal.aborted) return; // CHECK:
+        if (partidaController?.signal.aborted) return;
 
         acenderBotao(arrayLedsAcesos[cor]);
         await delayComPausa(TEMPO_LED_ACESO);
@@ -341,30 +337,26 @@ async function mostrarSequenciaGlobal() {
         await delayComPausa(TEMPO_LED_APAGADO);
     }
 }
-
-function mostrarPlacar() {
-
+// TODO:
+async function mostrarPlacar() {
+    
 }
-
+// rotina ao terminar jogo. no final, chama resetJogo, que chama setupJogo,
+// reiniciando o loop
 async function terminarJogo() {
     printaString(msgsSistema, 8, 1); //O JOGO ACABOU!
     await sleep(2000);
 
-    mostrarPlacar(); // TODO: checar tb se precisa de await aqui
+    await mostrarPlacar();
     await resetJogo();
 }
 
 // SECTION: menus
 
-// TODO: definir melhor como será mostrado o menu
-// TEST:
 async function menuSetup() {
-    // NOTE: msg na tela:
-    // '--  Escolha  --'
-    // '-- qtd player --'
-    printaString(menuSetupMsgs, 0, 0);
-    printaString(menuSetupMsgs, 6, 1);
-    await sleep(1000);
+    printaString(menuSetupMsgs, 0, 0); //--  Escolha  -- (y=0)
+    printaString(menuSetupMsgs, 6, 1); //-- qtd player -- (y=1)
+    await sleep(750);
 
     // ativa o texto nos botões
     arrayQtdPlayers.forEach((botao) => {
@@ -392,7 +384,7 @@ async function menuSetup() {
     // printa na tela qnts jogadores foram confirmados
     printaString(menuSetupMsgs, 5, 0);
     printaString(menuSetupMsgs, opcaoSelecionada, 1);
-    await sleep(1500);
+    await sleep(750);
  
     // desativa o texto nos botões
     arrayQtdPlayers.forEach((botao) => {
@@ -465,8 +457,8 @@ async function loopJogo() {
                 printaString(msgsSistema, 7, 1); //VOCÊ GANHOU!
                 await sleep(2000);
                 partidaAtiva = false;
-                // CHECK:
-                // terminarJogo();
+                // não termina jogo automaticamente pra pessoa comemorar/mostrar pros amigo lol
+                // TODO: uma animaçãozinha pra mostrar q a pessoa ganhou sei la, fogos de artificio
                 return;
             } else {
                 newRandomColor(); //se acertar, +1 cor
@@ -490,22 +482,3 @@ async function loopJogo() {
 
 // chamando nossa função de entrada
 setupJogo();
-
-// VERIFY: chamadas de funções async sem await
-// TODO:
-// - countdown qnd voltar da pausa pro jogo?
-// - como pessoa vai sair do jogo
-// - quando for selecionar players, mostrar quantidade pra seleção nos botões
-// - lógica pra verificar sequência a cada inserção
-// - setup e loop
-// COMMENT: nosso antigo struct "filaCor" não  é mais necessário, então apenas implementamos FIFO usando push() -> enqueue e shift() -> dequeue()
-// COMMENT: faremos:
-// ENQUEUE:
-// function filaCorEnqueue(cor) {
-//     filaCor.push(cor);
-// }
-// COMMENT: e:
-// DEQUEUE: retorna 'undefined' se vazia
-// function filaCorDequeue() {
-//     return filaCor.shift();
-// }
