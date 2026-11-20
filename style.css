@@ -61,6 +61,8 @@ body {
 
 #quadrante-azul, #quadrante-amarelo, #quadrante-vermelho, #quadrante-verde {
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 /* texto dos botões (qtd de players a serem selecionados) */
