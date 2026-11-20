@@ -1,0 +1,55 @@
+// Fluxograma de funcionamento do Genius Web — gerar com:
+//   dot -Tpng -Gdpi=200 docs/fluxograma.dot -o docs/fluxograma.png
+digraph Genius {
+  graph [rankdir=TB, fontname="Helvetica", bgcolor="white", nodesep=0.45, ranksep=0.42, pad=0.3,
+         label="Fluxograma de funcionamento — Genius Web (máquina de estados)", labelloc=t, fontsize=20];
+  node  [fontname="Helvetica", fontsize=12, style="filled,rounded", shape=box, color="#334155", fillcolor="#f1f5f9", penwidth=1.3, margin="0.18,0.08"];
+  edge  [fontname="Helvetica", fontsize=11, color="#334155", arrowsize=0.8];
+
+  inicio   [label="Abrir o link no navegador\n(desktop, tablet ou celular)", shape=oval, fillcolor="#e2e8f0"];
+  ajuda    [label="Primeira visita?\nMostrar \"Como jogar\"", shape=diamond, style="filled", fillcolor="#fff7d6", color="#b45309"];
+  ocioso   [label="(1) TELA INICIAL — estado OCIOSO\nEscolher Nível e Jogadores · Som · Narrar\nModo livre: tocar cores para ouvir", fillcolor="#dbeafe", color="#1d4ed8"];
+  start    [label="Clique/toque em Iniciar\nou tecla Enter", shape=parallelogram, style="filled", fillcolor="#ffffff"];
+  prep     [label="Desbloquear áudio (Web Audio)\nZerar sequência e placar\nContagem 3‑2‑1"];
+  sorteio  [label="(2) SORTEIO\ngerarProximaCor() → adiciona\nnova cor à sequência", fillcolor="#dcfce7", color="#15803d"];
+  exibir   [label="(3) EXIBIÇÃO — estado EXIBINDO\nPara cada cor: acende quadrante + toca nota\n(velocidade conforme nível e rodada)", fillcolor="#dcfce7", color="#15803d"];
+  bloq     [label="(4) Entrada BLOQUEADA durante a exibição\n→ ao terminar: concluirExibicao()\nestado ENTRADA: \"Sua vez!\"", fillcolor="#fef9c3", color="#a16207"];
+  ler      [label="(5) Ler jogada: pointerdown\n(mouse/toque) ou teclas 1‑4 / QWAS", shape=parallelogram, style="filled", fillcolor="#ffffff"];
+  valida   [label="validarJogada()\nCor == esperada?", shape=diamond, style="filled", fillcolor="#fff7d6", color="#b45309"];
+  fim_seq  [label="Completou a\nsequência?", shape=diamond, style="filled", fillcolor="#fff7d6", color="#b45309"];
+  acerto   [label="ACERTO parcial\nacende + som · avança barra", fillcolor="#f1f5f9"];
+  alvo     [label="Tamanho = alvo\ndo nível?", shape=diamond, style="filled", fillcolor="#fff7d6", color="#b45309"];
+  rodada   [label="(6a) RODADA COMPLETA\n+1 ponto · rodada++ · acelera nas\nrodadas 5/9/13 · passa a vez (multiplayer)", fillcolor="#dcfce7", color="#15803d"];
+  vitoria  [label="VITÓRIA\nsom de vitória", fillcolor="#bbf7d0", color="#15803d"];
+  erro     [label="(6b) ERRO\nsom grave + vibração\nmostra a cor correta", fillcolor="#fee2e2", color="#b91c1c"];
+  multi    [label="Multiplayer e restam\n≥ 2 jogadores?", shape=diamond, style="filled", fillcolor="#fff7d6", color="#b45309"];
+  elim     [label="Jogador eliminado\npróximo jogador repete\na MESMA sequência", fillcolor="#fee2e2", color="#b91c1c"];
+  gameover [label="FIM DE PARTIDA (Game Over / Vitória)\natualiza Recorde (localStorage)\nDiálogo: Jogar novamente / Fechar", fillcolor="#fecaca", color="#b91c1c"];
+  pausa    [label="PAUSA (P / Esc / troca de aba)\nContinuar · Reiniciar · Encerrar", shape=box, style="filled,dashed,rounded", fillcolor="#ede9fe", color="#6d28d9"];
+
+  inicio -> ajuda;
+  ajuda -> ocioso [label=" não / fechou"];
+  ocioso -> start -> prep -> sorteio -> exibir -> bloq -> ler -> valida;
+  valida -> fim_seq [label=" sim", color="#15803d", fontcolor="#15803d"];
+  valida -> erro [label=" não", color="#b91c1c", fontcolor="#b91c1c"];
+  fim_seq -> acerto [label=" não"];
+  acerto -> ler [label=" aguarda próxima\n cor", style=dashed];
+  fim_seq -> alvo [label=" sim"];
+  alvo -> rodada [label=" não"];
+  alvo -> vitoria [label=" sim"];
+  rodada -> sorteio [label=" nova cor", color="#15803d", fontcolor="#15803d"];
+  erro -> multi;
+  multi -> elim [label=" sim"];
+  multi -> gameover [label=" não"];
+  elim -> exibir [label=" repete exibição"];
+  vitoria -> gameover [label=" salva recorde"];
+  gameover -> ocioso [label=" Jogar novamente\n ou Fechar", style=dashed];
+
+  exibir -> pausa [style=dotted, dir=both, color="#6d28d9", label=" a qualquer\n momento", fontcolor="#6d28d9"];
+  pausa -> ocioso [style=dotted, color="#6d28d9", label=" Encerrar", fontcolor="#6d28d9"];
+
+  {rank=same; valida; erro;}
+  {rank=same; fim_seq; multi;}
+  {rank=same; alvo; elim;}
+  {rank=same; exibir; pausa;}
+}

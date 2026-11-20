@@ -1,0 +1,15 @@
+{
+  "name": "genius-web-unicap",
+  "version": "2.0.0",
+  "description": "Jogo Genius (Simon) para web: responsivo, acessível e multiplayer local (1 a 4 jogadores).",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "node tests/e2e/responsivo.cjs",
+    "start": "npx serve ."
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  },
+  "license": "MIT"
+}

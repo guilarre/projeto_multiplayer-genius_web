@@ -1,35 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title></title>
-        <!-- importando nosso .css -->
-        <link href="./style.css" rel="stylesheet">
-        <!-- importando jetbrains mono como nossa fonte (é open-source) -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
-    </head>
+<head>
+  <meta charset="UTF-8">
+  <!-- viewport-fit=cover: aproveita a tela inteira em celulares com "notch" -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Genius Web: jogo de memória com cores e sons. Funciona no computador, tablet e celular, com mouse, teclado ou toque.">
+  <meta name="theme-color" content="#0d1218">
+  <title>Genius Web — Jogo da Memória com Cores e Sons</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 16H2A14 14 0 0 1 16 2z' fill='%2318bd62'/%3E%3Cpath d='M16 16V2a14 14 0 0 1 14 14z' fill='%23f0444f'/%3E%3Cpath d='M16 16h14a14 14 0 0 1-14 14z' fill='%23268eff'/%3E%3Cpath d='M16 16v14A14 14 0 0 1 2 16z' fill='%23ffd23f'/%3E%3C/svg%3E">
+  <!-- Fonte JetBrains Mono (open-source) para o display; há fallback monoespaçado do sistema -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="./css/style.css" rel="stylesheet">
+</head>
 
-    <body>
-        <button id="btn-pausa" type="button">Pausar jogo</button>
+<body data-fase="OCIOSO">
+  <!-- Link de pular: usuários de teclado/leitor de tela vão direto ao jogo -->
+  <a class="pular-link" href="#area-tabuleiro">Pular para o tabuleiro</a>
 
-        <div id="modal-pausa">
-            <div id="modal-conteudo">
-                <h2>Jogo pausado</h2>
-                <ul>
-                    <li id="opt-voltar">Voltar ao jogo</li>
-                    <li id="opt-reiniciar">Reiniciar jogo</li>
-                    <li id="opt-terminar">Terminar jogo</li>
-                </ul>
-            </div>
+  <!-- ===================== CABEÇALHO ===================== -->
+  <header class="topo">
+    <h1 class="marca">Genius<span>Web</span></h1>
+    <button id="btn-ajuda" class="btn btn-icone" type="button" aria-haspopup="dialog" aria-controls="dlg-ajuda">
+      <span aria-hidden="true">?</span> Como jogar
+    </button>
+  </header>
+
+  <main class="layout">
+    <!-- ===================== PAINEL DE STATUS / PLACAR ===================== -->
+    <section class="painel painel-status" aria-labelledby="titulo-placar">
+      <h2 id="titulo-placar" class="sr-only">Placar</h2>
+
+      <!-- Mensagem principal. role=status + aria-live: leitores de tela anunciam cada mudança -->
+      <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">
+        Escolha o nível e toque em <strong>Iniciar</strong>.
+      </p>
+
+      <dl class="placar">
+        <div class="placar-item">
+          <dt>Rodada</dt>
+          <dd><span id="placar-rodada">0</span><small> / <span id="placar-alvo">8</span></small></dd>
         </div>
+        <div class="placar-item">
+          <dt>Recorde</dt>
+          <dd id="placar-recorde">0</dd>
+        </div>
+        <div class="placar-item">
+          <dt>Vez de</dt>
+          <dd id="placar-vez">—</dd>
+        </div>
+      </dl>
 
-        <div id="game-container">
-            <svg width="408" height="408" viewBox="0 0 408 408" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g id="Tabuleiro Genius WEB">
-            <g id="Estrutura circular">
+      <!-- Barra de progresso da vez do jogador (quantas cores já acertou) -->
+      <div class="progresso" aria-hidden="true"><div id="barra-progresso" class="progresso-barra"></div></div>
+
+      <!-- Lista de jogadores (visível só no multiplayer) -->
+      <ol id="lista-jogadores" class="lista-jogadores" aria-label="Jogadores" hidden></ol>
+    </section>
+
+    <!-- ===================== TABULEIRO ===================== -->
+    <section id="area-tabuleiro" class="area-tabuleiro" aria-label="Tabuleiro" tabindex="-1">
+      <svg id="tabuleiro" class="tabuleiro" viewBox="0 0 408 408" role="group" aria-labelledby="tabuleiro-titulo" focusable="false" fill="none" xmlns="http://www.w3.org/2000/svg">
+<title id="tabuleiro-titulo">Tabuleiro do Genius com 4 botões coloridos</title>
+            <g id="tabuleiro-genius">
+            <g id="estrutura-circular" aria-hidden="true">
             <g id="sombra-corpo" opacity="0.72" filter="url(#filter0_df_6_58)">
             <path d="M203.868 395.424C309.661 395.424 395.424 309.661 395.424 203.868C395.424 98.0746 309.661 12.312 203.868 12.312C98.0745 12.312 12.312 98.0746 12.312 203.868C12.312 309.661 98.0745 395.424 203.868 395.424Z" fill="#05080D"/>
             </g>
@@ -38,7 +73,7 @@
             <path id="linha-aro-superior" d="M392.15 203.868C392.15 307.853 307.853 392.15 203.868 392.15C99.883 392.15 15.5865 307.853 15.5865 203.868C15.5865 99.883 99.883 15.5865 203.868 15.5865C307.853 15.5865 392.15 99.883 392.15 203.868Z" stroke-width="0.684" stroke="#8290A0" stroke-opacity="0.42"/>
             <path id="base-quadrantes" d="M203.868 383.963C303.332 383.963 383.963 303.332 383.963 203.868C383.963 104.404 303.332 23.7726 203.868 23.7726C104.404 23.7726 23.7726 104.404 23.7726 203.868C23.7726 303.332 104.404 383.963 203.868 383.963Z" fill="#111923" stroke-width="1.71" stroke="#060A10"/>
             </g>
-            <g id="Clip path group">
+            <g id="grupo-mascara">
             <mask id="mask0_6_58" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="23" y="23" width="361" height="361">
             <g id="limite-circular">
             <path id="Vector" d="M203.868 383.963C303.332 383.963 383.963 303.332 383.963 203.868C383.963 104.404 303.332 23.7726 203.868 23.7726C104.404 23.7726 23.7726 104.404 23.7726 203.868C23.7726 303.332 104.404 383.963 203.868 383.963Z" fill="white"/>
@@ -46,62 +81,62 @@
             </mask>
             <g mask="url(#mask0_6_58)">
             <g id="botoes-coloridos">
-            <g id="quadrante-verde">
+            <g id="quadrante-verde" class="quadrante" data-cor="0" role="button" tabindex="0" aria-label="Verde — tecla 1 ou Q" aria-keyshortcuts="1 Q">
             <g id="verde-apagado">
             <path id="forma-verde-normal" d="M203.868 203.868H23.7726C23.7726 156.104 42.7469 110.296 76.5213 76.5213C110.296 42.7469 156.104 23.7726 203.868 23.7726V203.868Z" fill="url(#paint2_linear_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_2" d="M203.868 203.868H23.7726C23.7726 156.104 42.7469 110.296 76.5213 76.5213C110.296 42.7469 156.104 23.7726 203.868 23.7726" stroke-width="1.026" stroke="#B7FFD0" stroke-opacity="0.2"/>
             </g>
-            <g id="verde-aceso">
+            <g id="verde-aceso" class="aceso">
             <path id="forma-verde-normal_2" d="M203.868 203.868H23.7726C23.7726 156.104 42.7469 110.296 76.5213 76.5213C110.296 42.7469 156.104 23.7726 203.868 23.7726V203.868Z" fill="url(#paint3_radial_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_3" d="M203.868 203.868H23.7726C23.7726 156.104 42.7469 110.296 76.5213 76.5213C110.296 42.7469 156.104 23.7726 203.868 23.7726" stroke-width="1.026" stroke="#B7FFD0" stroke-opacity="0.2"/>
             </g>
-            <g id="1P" filter="url(#filter1_d_6_58)">
+            <g id="rotulo-verde" class="rotulo" aria-hidden="true" filter="url(#filter1_d_6_58)">
             <text fill="white" style="white-space: pre" xml:space="preserve" font-family="JetBrains Mono" font-size="36" font-weight="bold" letter-spacing="0em"><tspan x="101.019" y="127.272">1</tspan></text>
             </g>
             </g>
-            <g id="quadrante-vermelho">
+            <g id="quadrante-vermelho" class="quadrante" data-cor="1" role="button" tabindex="0" aria-label="Vermelho — tecla 2 ou W" aria-keyshortcuts="2 W">
             <g id="vermelho-apagado">
             <path id="forma-vermelho-normal" d="M203.868 203.868V23.7726C251.632 23.7726 297.44 42.7469 331.215 76.5213C364.989 110.296 383.963 156.104 383.963 203.868H203.868Z" fill="url(#paint4_linear_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_4" d="M203.868 203.868V23.7726C251.632 23.7726 297.44 42.7469 331.215 76.5213C364.989 110.296 383.963 156.104 383.963 203.868" stroke-width="1.026" stroke="#FFD0D0" stroke-opacity="0.2"/>
             </g>
-            <g id="vermelho-aceso">
+            <g id="vermelho-aceso" class="aceso">
             <path id="forma-vermelho-normal_2" d="M203.868 203.868V23.7726C251.632 23.7726 297.44 42.7469 331.215 76.5213C364.989 110.296 383.963 156.104 383.963 203.868H203.868Z" fill="url(#paint5_radial_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_5" d="M203.868 203.868V23.7726C251.632 23.7726 297.44 42.7469 331.215 76.5213C364.989 110.296 383.963 156.104 383.963 203.868" stroke-width="1.026" stroke="#FFD0D0" stroke-opacity="0.2"/>
             </g>
-            <g id="2P" filter="url(#filter2_d_6_58)">
+            <g id="rotulo-vermelho" class="rotulo" aria-hidden="true" filter="url(#filter2_d_6_58)">
             <text fill="white" style="white-space: pre" xml:space="preserve" font-family="JetBrains Mono" font-size="36" font-weight="bold" letter-spacing="0em"><tspan x="281.019" y="127.272">2</tspan></text>
             </g>
             </g>
-            <g id="quadrante-azul">
+            <g id="quadrante-azul" class="quadrante" data-cor="3" role="button" tabindex="0" aria-label="Azul — tecla 4 ou S" aria-keyshortcuts="4 S">
             <g id="azul-apagado">
             <path id="forma-azul-normal" d="M203.868 203.868H383.963C383.963 251.632 364.989 297.44 331.215 331.215C297.44 364.989 251.632 383.963 203.868 383.963V203.868Z" fill="url(#paint6_linear_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_6" d="M203.868 203.868H383.963C383.963 251.632 364.989 297.44 331.215 331.215C297.44 364.989 251.632 383.963 203.868 383.963" stroke-width="1.026" stroke="#D0E9FF" stroke-opacity="0.2"/>
             </g>
-            <g id="azul-aceso">
+            <g id="azul-aceso" class="aceso">
             <path id="forma-azul-normal_2" d="M203.868 203.868H383.963C383.963 251.632 364.989 297.44 331.215 331.215C297.44 364.989 251.632 383.963 203.868 383.963V203.868Z" fill="url(#paint7_radial_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_7" d="M203.868 203.868H383.963C383.963 251.632 364.989 297.44 331.215 331.215C297.44 364.989 251.632 383.963 203.868 383.963" stroke-width="1.026" stroke="#D0E9FF" stroke-opacity="0.2"/>
             </g>
-            <g id="4P" filter="url(#filter3_d_6_58)">
+            <g id="rotulo-azul" class="rotulo" aria-hidden="true" filter="url(#filter3_d_6_58)">
             <text fill="white" style="white-space: pre" xml:space="preserve" font-family="JetBrains Mono" font-size="36" font-weight="bold" letter-spacing="0em"><tspan x="281.019" y="307.272">4</tspan></text>
             </g>
             </g>
-            <g id="quadrante-amarelo">
+            <g id="quadrante-amarelo" class="quadrante" data-cor="2" role="button" tabindex="0" aria-label="Amarelo — tecla 3 ou A" aria-keyshortcuts="3 A">
             <g id="amarelo-apagado">
             <path id="forma-amarelo-normal" d="M203.868 203.868V383.963C156.104 383.963 110.296 364.989 76.5213 331.215C42.7469 297.44 23.7726 251.632 23.7726 203.868H203.868Z" fill="url(#paint8_linear_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_8" d="M203.868 203.868V383.963C156.104 383.963 110.296 364.989 76.5213 331.215C42.7469 297.44 23.7726 251.632 23.7726 203.868" stroke-width="1.026" stroke="#FFF3BC" stroke-opacity="0.22"/>
             </g>
-            <g id="amarelo-aceso">
+            <g id="amarelo-aceso" class="aceso">
             <path id="forma-amarelo-normal_2" d="M203.868 203.868V383.963C156.104 383.963 110.296 364.989 76.5213 331.215C42.7469 297.44 23.7726 251.632 23.7726 203.868H203.868Z" fill="url(#paint9_radial_6_58)" stroke-width="5.13" stroke-linejoin="round" stroke="#101720"/>
             <path id="Vector_9" d="M203.868 203.868V383.963C156.104 383.963 110.296 364.989 76.5213 331.215C42.7469 297.44 23.7726 251.632 23.7726 203.868" stroke-width="1.026" stroke="#FFF3BC" stroke-opacity="0.22"/>
             </g>
-            <g id="3P" filter="url(#filter4_d_6_58)">
+            <g id="rotulo-amarelo" class="rotulo" aria-hidden="true" filter="url(#filter4_d_6_58)">
             <text fill="white" style="white-space: pre" xml:space="preserve" font-family="JetBrains Mono" font-size="36" font-weight="bold" letter-spacing="0em"><tspan x="101.019" y="307.272">3</tspan></text>
             </g>
             </g>
             </g>
             </g>
             </g>
-            <g id="console-central">
+            <g id="console-central" aria-hidden="true">
             <g id="console-sombra" opacity="0.74" filter="url(#filter5_f_6_58)">
             <path d="M204.793 297.274C255.869 297.274 297.274 255.869 297.274 204.793C297.274 153.717 255.869 112.312 204.793 112.312C153.717 112.312 112.312 153.717 112.312 204.793C112.312 255.869 153.717 297.274 204.793 297.274Z" fill="#02050A"/>
             </g>
@@ -109,7 +144,7 @@
             <path id="console-corpo" d="M204.793 290.6C252.183 290.6 290.6 252.183 290.6 204.793C290.6 157.403 252.183 118.986 204.793 118.986C157.403 118.986 118.986 157.403 118.986 204.793C118.986 252.183 157.403 290.6 204.793 290.6Z" fill="url(#paint10_linear_6_58)" stroke-width="1.026" stroke="#657181" stroke-opacity="0.62"/>
             <path id="console-anel-interno" d="M285.356 204.793C285.356 249.287 249.287 285.356 204.793 285.356C160.299 285.356 124.23 249.287 124.23 204.793C124.23 160.299 160.299 124.23 204.793 124.23C249.287 124.23 285.356 160.299 285.356 204.793Z" stroke-width="1.026" stroke="#0A1018"/>
             <path id="console-reflexo-superior" d="M147.588 168.563C161.889 132.334 247.696 132.334 261.998 168.563" stroke-width="1.71" stroke-linecap="round" stroke="white" stroke-opacity="0.1"/>
-            <g id="Display LCD OLED / placeholder vazio">
+            <g id="display-lcd">
             <path id="moldura-display" d="M269.625 171.423H139.961C135.748 171.423 132.334 174.838 132.334 179.051V230.535C132.334 234.747 135.748 238.162 139.961 238.162H269.625C273.837 238.162 277.252 234.747 277.252 230.535V179.051C277.252 174.838 273.837 171.423 269.625 171.423Z" fill="#080E15" stroke-width="2.736" stroke="#050A10"/>
             <path id="tela-display-vazia" d="M266.765 177.144H142.821C140.188 177.144 138.054 179.278 138.054 181.911V227.675C138.054 230.308 140.188 232.442 142.821 232.442H266.765C269.397 232.442 271.532 230.308 271.532 227.675V181.911C271.532 179.278 269.397 177.144 266.765 177.144Z" fill="url(#paint11_linear_6_58)" stroke-width="1.026" stroke="#647487" stroke-opacity="0.78"/>
             <g id="reflexo-display">
@@ -245,10 +280,122 @@
             </linearGradient>
             </defs>
             </svg>
-        </div>
+    </section>
 
-        <script src="./genius_game.js" defer></script>
-        <!-- TEST: -->
-        <!-- <script src="./tests/test-botoes.js" defer></script> -->
-    </body>
+    <!-- ===================== CONTROLES ===================== -->
+    <section class="painel painel-controles" aria-labelledby="titulo-controles">
+      <h2 id="titulo-controles" class="sr-only">Controles</h2>
+
+      <div class="acoes">
+        <button id="btn-iniciar" class="btn btn-primario" type="button" aria-keyshortcuts="Enter">
+          <span aria-hidden="true">▶</span> <span class="rotulo-btn">Iniciar</span>
+        </button>
+        <button id="btn-pausa" class="btn" type="button" aria-keyshortcuts="P Escape" disabled>
+          <span aria-hidden="true">❚❚</span> Pausar
+        </button>
+      </div>
+
+      <div class="campos">
+        <div class="campo">
+          <label for="sel-nivel">Nível</label>
+          <select id="sel-nivel" aria-describedby="dica-config">
+            <option value="1">Fácil (8)</option>
+            <option value="2">Médio (14)</option>
+            <option value="3">Difícil (20)</option>
+            <option value="4">Expert (31)</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="sel-jogadores">Jogadores</label>
+          <select id="sel-jogadores" aria-describedby="dica-config">
+            <option value="1">1 jogador</option>
+            <option value="2">2 jogadores</option>
+            <option value="3">3 jogadores</option>
+            <option value="4">4 jogadores</option>
+          </select>
+        </div>
+      </div>
+      <p id="dica-config" class="dica">Nível (nº de cores para vencer) e jogadores podem ser trocados antes de iniciar.</p>
+
+      <div class="alternancias">
+        <!-- aria-pressed indica o estado do botão-chave (ligado/desligado) -->
+        <button id="btn-som" class="btn btn-chave" type="button" aria-pressed="true" aria-keyshortcuts="M">
+          <span class="chave-indicador" aria-hidden="true"></span> Som
+        </button>
+        <button id="btn-narrar" class="btn btn-chave" type="button" aria-pressed="false" aria-describedby="dica-narrar">
+          <span class="chave-indicador" aria-hidden="true"></span> Narrar cores
+        </button>
+      </div>
+      <p id="dica-narrar" class="dica">"Narrar cores" fala em voz alta e mostra o nome de cada cor (e deixa a sequência um pouco mais lenta).</p>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p><kbd>1</kbd>–<kbd>4</kbd> ou <kbd>Q</kbd> <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> jogam · <kbd>Enter</kbd> inicia · <kbd>P</kbd> pausa · <kbd>M</kbd> som</p>
+    <p class="creditos">UNICAP · Robótica · Prof. Emmanuel Barreto · Adriano Arraujo, Guilherme Larré e Francis Lauriano · 2026</p>
+  </footer>
+
+  <!-- Legenda acessível da sequência (modo "Narrar cores") -->
+  <div id="legenda-cor" class="legenda-cor" aria-hidden="true"></div>
+  <!-- Região "assertive" para narração imediata das cores -->
+  <div id="narrador" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- ===================== DIÁLOGOS (MODAIS) ===================== -->
+  <!-- <dialog> nativo: prende o foco, fecha com Esc e é anunciado como modal -->
+  <dialog id="dlg-ajuda" class="dialogo" aria-labelledby="ajuda-titulo">
+    <h2 id="ajuda-titulo">Como jogar</h2>
+    <ol class="passos">
+      <li>Toque em <strong>Iniciar</strong>.</li>
+      <li><strong>Observe</strong>: o Genius acende cores e toca sons.</li>
+      <li>Quando aparecer <strong>"Sua vez!"</strong>, repita as cores na mesma ordem.</li>
+      <li>Acertou? Uma cor nova entra na sequência. Errou? Fim de jogo.</li>
+    </ol>
+    <h3>Controles</h3>
+    <table class="tabela-atalhos">
+      <caption class="sr-only">Atalhos de teclado</caption>
+      <thead><tr><th scope="col">Botão</th><th scope="col">Teclas</th><th scope="col">Posição</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pino verde" aria-hidden="true"></span>Verde (1)</td><td><kbd>1</kbd> ou <kbd>Q</kbd></td><td>superior esquerdo</td></tr>
+        <tr><td><span class="pino vermelho" aria-hidden="true"></span>Vermelho (2)</td><td><kbd>2</kbd> ou <kbd>W</kbd></td><td>superior direito</td></tr>
+        <tr><td><span class="pino amarelo" aria-hidden="true"></span>Amarelo (3)</td><td><kbd>3</kbd> ou <kbd>A</kbd></td><td>inferior esquerdo</td></tr>
+        <tr><td><span class="pino azul" aria-hidden="true"></span>Azul (4)</td><td><kbd>4</kbd> ou <kbd>S</kbd></td><td>inferior direito</td></tr>
+      </tbody>
+    </table>
+    <p>Também é possível navegar com <kbd>Tab</kbd> e apertar <kbd>Enter</kbd> ou <kbd>Espaço</kbd> no botão colorido. <kbd>P</kbd> ou <kbd>Esc</kbd> pausa; <kbd>M</kbd> liga/desliga o som.</p>
+    <h3>Multiplayer (2 a 4 pessoas)</h3>
+    <p>Todos compartilham a mesma sequência e jogam em turnos. Quem errar sai; o último que sobrar vence.</p>
+    <h3>Dicas de acessibilidade</h3>
+    <ul>
+      <li>Cada botão tem um <strong>número</strong>, então não é preciso distinguir as cores.</li>
+      <li>Não há limite de tempo para responder.</li>
+      <li>Ative <strong>Narrar cores</strong> para ouvir o nome de cada cor em voz alta (funciona mesmo com o Som desligado).</li>
+    </ul>
+    <div class="dialogo-acoes">
+      <button class="btn btn-primario" type="button" data-fechar>Entendi</button>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-pausa" class="dialogo" aria-labelledby="pausa-titulo">
+    <h2 id="pausa-titulo">Jogo pausado</h2>
+    <p id="pausa-resumo" class="dialogo-resumo"></p>
+    <div class="dialogo-acoes empilhado">
+      <button id="pausa-continuar" class="btn btn-primario" type="button">Continuar</button>
+      <button id="pausa-reiniciar" class="btn" type="button">Reiniciar partida</button>
+      <button id="pausa-encerrar" class="btn btn-perigo" type="button">Encerrar partida</button>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-fim" class="dialogo" aria-labelledby="fim-titulo" aria-describedby="fim-resumo">
+    <h2 id="fim-titulo">Fim de jogo</h2>
+    <p id="fim-resumo" class="dialogo-resumo"></p>
+    <ol id="fim-ranking" class="ranking" hidden></ol>
+    <div class="dialogo-acoes">
+      <button id="fim-novamente" class="btn btn-primario" type="button">Jogar novamente</button>
+      <button class="btn" type="button" data-fechar>Fechar</button>
+    </div>
+  </dialog>
+
+  <script src="./js/genius-core.js"></script>
+  <script src="./js/genius-ui.js"></script>
+</body>
 </html>
