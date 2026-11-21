@@ -1,14 +1,14 @@
 # Desenvolvimento de Interface Web Responsiva para o Jogo Genius
 
-UNICAP · Disciplina design de Interface e Usabilidade · Versão de 20/11/2026
+UNICAP · Disciplina de Design de Interface e Usabilidade · Versão de 20/11/2026
 
 **GeniusWeb UNICAP: Jogo Interativo Multiplataforma, Acessível e Multiplayer**
 
-Modelo de documentação e entrega de projeto acadêmico. Disciplina design de Interface e Usabilidade: especificação, design de interface web, requisitos e TDD. Dezembro de 2026.
+Modelo de documentação e entrega de projeto acadêmico. Disciplina de Design de Interface e Usabilidade: especificação, design de interface web, requisitos e TDD. Dezembro de 2026.
 
 | Item | Informação |
 | --- | --- |
-| Instituição / Disciplina | Universidade Católica de Pernambuco (UNICAP), Disciplina design de Interface e Usabilidade |
+| Instituição / Disciplina | Universidade Católica de Pernambuco (UNICAP), Disciplina de Design de Interface e Usabilidade |
 | Professor(a) Responsável | Prof. Emmanuel Barreto |
 | Equipe de Alunos | \[Nome do Grupo\]: Adriano Araujo, Guilherme Larré e Franciscleide Lauriano |
 | Plataforma Exigida | Ambiente Web Responsivo (Desktops, Notebooks, Tablets e Celulares) com Link Online |
@@ -24,7 +24,7 @@ Este documento apresenta a especificação técnica, a arquitetura de interface,
 | Item | Informação Institucional |
 | --- | --- |
 | Instituição de Ensino | Universidade Católica de Pernambuco (UNICAP) |
-| Disciplina | Robótica |
+| Disciplina | Design de Interface e Usabilidade |
 | Professor(a) Responsável | Prof. Emmanuel Barreto |
 | Turma / Período Letivo | \[Turma\] / 2026.2 |
 | Data de Entrega | 12 de dezembro de 2026 |
@@ -33,9 +33,9 @@ Este documento apresenta a especificação técnica, a arquitetura de interface,
 
 | Integrante | Nome Completo | Matrícula / RA | CPF | Data Nasc. | Papel no Projeto Web |
 | --- | --- | --- | --- | --- | --- |
-| Aluno 1 | Adriano Arraujo | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Design de interface (tabuleiro SVG) / CSS responsivo |
+| Aluno 1 | Adriano Araujo | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Design de interface (tabuleiro SVG) / CSS responsivo |
 | Aluno 2 | Guilherme Larré ([github.com/guilarre](https://github.com/guilarre)) | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Líder / Lógica do jogo em JavaScript e repositório |
-| Aluno 3 | Francis Lauriano ([github.com/francisLauriano](https://github.com/francisLauriano)) | \[860720\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Áudio web, acessibilidade, testes TDD e deploy |
+| Aluno 3 | Franciscleide Lauriano ([github.com/francisLauriano](https://github.com/francisLauriano)) | 860720 | \[000.000.000-00\] | \[DD/MM/AAAA\] | Áudio web, acessibilidade, testes TDD e deploy |
 
 **Breve apresentação da equipe e divisão de atividades:** a equipe partiu de conhecimentos de HTML, CSS e JavaScript, lógica de programação e noções de UX/UI. A primeira versão do jogo foi portada da lógica de um protótipo em Arduino (C++) e já tinha o tabuleiro SVG desenhado em ferramenta de design vetorial e o modo multiplayer. Na segunda fase, o trabalho foi dividido em três frentes que se integram pelo repositório Git: (1) lógica pura do jogo com testes unitários; (2) interface responsiva e acessível; (3) áudio, testes de interface em vários dispositivos e publicação no GitHub Pages. O código-fonte e o histórico de commits ficam no repositório de Guilherme Larré no GitHub.
 
@@ -262,7 +262,7 @@ A Figura 3 usa capturas reais da aplicação geradas pelos testes automatizados.
 | Link Direto do Jogo Online (Obrigatório) | <https://guilarre.github.io/projeto_multiplayer-genius_web/> |
 | Link do Repositório (GitHub) | <https://github.com/guilarre/projeto_multiplayer-genius_web> |
 | Plataforma de Hospedagem Utilizada | GitHub Pages (site estático, HTTPS, sem login) |
-| Dispositivos Validados pela Equipe | ☑ Desktop (1920×1080) ☑ Notebook (1366×68) ☑ Tablet (768×1024) ☑ Celular (360×800 / 390×844), além de celular em paisagem (800×360). Validados por emulação no Chrome (TST-02). \[Confirmar também em um celular real: TST-03.\] |
+| Dispositivos Validados pela Equipe | ☑ Desktop (1920×1080) ☑ Notebook (1366×768) ☑ Tablet (768×1024) ☑ Celular (360×800 / 390×844), além de celular em paisagem (800×360). Validados por emulação no Chrome (TST-02). \[Confirmar também em um celular real: TST-03.\] |
 
 ### 4.2 Código-Fonte do Jogo Comentado
 
@@ -861,7 +861,7 @@ Em 20/11/2026 a implementação e os testes automatizados estão concluídos. Fa
 | Até 15/nov | Quest 4 | Interface responsiva (HTML5/CSS3/JS), motor sonoro e documentação dos requisitos (RF/RNF/RTEC). | Concluído / \[Responsável\] |
 | Até 30/nov | Quest 5 (início) | Testes unitários TDD da lógica e ajustes de responsividade e toque em múltiplos dispositivos. | Concluído (automatizados); aparelho real em andamento / \[Responsável\] |
 | 01 a 10/dez | Quest 5 e Deploy | Publicação do link online, revisão do código comentado e testes finais em desktops, notebooks, tablets e celulares. | Pendente / \[Responsável\] |
-| 12/dez/2026 | Entrega Final | Demonstração ao vivo pelo link online e entrega deste documento na disciplina design de Interface e Usabilidade (UNICAP). | Marco final / Equipe |
+| 12/dez/2026 | Entrega Final | Demonstração ao vivo pelo link online e entrega deste documento na disciplina de Design de Interface e Usabilidade (UNICAP). | Marco final / Equipe |
 
 ## 6. Referências Bibliográficas
 
@@ -876,9 +876,9 @@ Em 20/11/2026 a implementação e os testes automatizados estão concluídos. Fa
 
 ## 7. Checklist Final de Conferência Obrigatória
 
-- [ ] Dados institucionais (UNICAP / Robótica) e tabela completa de apresentação dos alunos preenchidos.
+- [ ] Dados institucionais (UNICAP / Design de Interface e Usabilidade) e tabela completa de apresentação dos alunos preenchidos.
 
-  Faltam nome do grupo, turma, matrícula, CPF e data de nascimento.
+  Faltam nome do grupo, turma, matrículas de Adriano e Guilherme, CPF e data de nascimento.
 - [x] Quests 1 a 5 preenchidas com Requisitos Funcionais (RF), Não-Funcionais (RNF), Técnicos (RTEC) e Matriz TDD.
 - [x] Fluxograma de funcionamento do jogo inserido e explicado na Seção 3.1.
 - [x] Diagrama de telas (Desktop e Mobile) inserido e todos os elementos da tela explicados na Tabela 1 (Seção 3.2).

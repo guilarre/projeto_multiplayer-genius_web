@@ -57,7 +57,7 @@
 # Contexto :information_source:
 
 <p align="justify">
-O projeto foi desenvolvido para a disciplina de <strong>Robótica</strong> da <strong>Universidade Católica de Pernambuco (UNICAP)</strong>, sob orientação do <strong>Prof. Emmanuel Barreto</strong>, em 2026. O trabalho consiste em criar uma interface web responsiva para o <strong>Genius</strong> (Simon), o clássico jogo de memória sequencial com quatro cores e sons.
+O projeto foi desenvolvido para a disciplina de <strong>Design de Interface e Usabilidade</strong> da <strong>Universidade Católica de Pernambuco (UNICAP)</strong>, sob orientação do <strong>Prof. Emmanuel Barreto</strong>, em 2026. O trabalho consiste em criar uma interface web responsiva para o <strong>Genius</strong> (Simon), o clássico jogo de memória sequencial com quatro cores e sons.
 </p>
 
 <p align="justify">

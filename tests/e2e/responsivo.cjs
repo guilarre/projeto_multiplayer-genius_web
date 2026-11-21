@@ -14,7 +14,9 @@ const VIEWPORTS = [
   { nome: 'celular-paisagem', width: 800, height: 360, touch: true },
   { nome: 'tablet', width: 768, height: 1024, touch: true },
   { nome: 'notebook', width: 1366, height: 768, touch: false },
-  { nome: 'desktop', width: 1920, height: 1080, touch: false }
+  { nome: 'desktop', width: 1920, height: 1080, touch: false },
+  { nome: 'desktop-zoom125', width: 1536, height: 695, touch: false },
+  { nome: 'desktop-zoom150', width: 1280, height: 550, touch: false }
 ];
 
 const resultados = [];
@@ -64,6 +66,18 @@ async function aguardarVez(page) {
       'tabuleiro ' + Math.round(medidas.tab.w) + 'px, scroll-x=' + medidas.scrollX + ', alvos<44px=' + medidas.pequenos.length + ', fonte mín=' + medidas.fonteMin + 'px, erros=' + erros.length);
     if (!ok) { falhas++; console.log(medidas, erros); }
     await page.screenshot({ path: path.join(SHOTS, 'inicial-' + vp.nome + '.png') });
+    // Rodape visivel: rola ate o fim e confere se o rodape inteiro aparece na tela
+    await page.evaluate(() => scrollTo({ top: document.scrollingElement.scrollHeight, behavior: 'instant' }));
+    await page.waitForTimeout(100);
+    const fim = await page.evaluate(() => {
+      const r = document.querySelector('.rodape').getBoundingClientRect();
+      const creditos = getComputedStyle(document.querySelector('.creditos')).display !== 'none';
+      return { visivel: r.bottom <= innerHeight + 1 && r.height > 0, creditos };
+    });
+    const okRodape = fim.visivel && (vp.width < 960 || fim.creditos);
+    registrar('TST-02 rodape ' + vp.nome, okRodape, 'rodape alcancavel=' + fim.visivel + ', creditos visiveis=' + fim.creditos);
+    if (!okRodape) falhas++;
+    await page.evaluate(() => scrollTo(0, 0));
 
     if (vp.nome === 'celular' || vp.nome === 'desktop') {
       await page.evaluate(() => window.__genius.iniciar());
