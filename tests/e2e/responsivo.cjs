@@ -1,10 +1,3 @@
-/* ============================================================================
- * TESTES DE INTERFACE (E2E) — Playwright
- * Cobre TST-02 (multi-tela), TST-03 (toque), TST-04 (recorde/som), TST-06
- * (teclado) e verifica erros de console (RNF-03).
- * Executar:  npm run test:e2e
- *   (opcional) CHROME_PATH=/caminho/do/chrome  URL=https://...  SHOTS=pasta
- * ==========================================================================*/
 const path = require('node:path');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
@@ -14,6 +7,7 @@ const URL = process.env.URL || 'file://' + path.resolve(__dirname, '../../index.
 const SHOTS = process.env.SHOTS || path.resolve(__dirname, '../../docs/capturas');
 fs.mkdirSync(SHOTS, { recursive: true });
 
+// Tamanhos de tela testados
 const VIEWPORTS = [
   { nome: 'celular', width: 360, height: 800, touch: true },
   { nome: 'celular-390', width: 390, height: 844, touch: true },
@@ -29,7 +23,6 @@ function registrar(id, ok, detalhe) {
   console.log((ok ? '  ✔ ' : '  ✘ ') + id + ' — ' + detalhe);
 }
 
-// Lê a sequência atual e espera a fase ENTRADA (vez do jogador)
 async function aguardarVez(page) {
   await page.waitForFunction(() => window.__genius.estado().fase === 'ENTRADA', null, { timeout: 30000 });
   return page.evaluate(() => window.__genius.estado().sequencia);
@@ -39,14 +32,13 @@ async function aguardarVez(page) {
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
   let falhas = 0;
 
-  // ---------------- TST-02: responsividade em 6 viewports ----------------
+  // TST-02: responsividade em 6 tamanhos de tela
   for (const vp of VIEWPORTS) {
     const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, hasTouch: vp.touch, isMobile: vp.touch, deviceScaleFactor: 1 });
     await ctx.addInitScript(() => localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true })));
     const page = await ctx.newPage();
     const erros = [];
     page.on('pageerror', (e) => erros.push(e.message));
-    // A fonte do Google é opcional (há fallback local); falhas de rede dela não contam como erro
     let falhasFonte = 0;
     page.on('requestfailed', (req) => { if (/fonts\.(googleapis|gstatic)\.com/.test(req.url())) falhasFonte++; });
     page.on('console', (m) => {
@@ -73,7 +65,6 @@ async function aguardarVez(page) {
     if (!ok) { falhas++; console.log(medidas, erros); }
     await page.screenshot({ path: path.join(SHOTS, 'inicial-' + vp.nome + '.png') });
 
-    // Capturas extras para o diagrama de telas (celular e desktop)
     if (vp.nome === 'celular' || vp.nome === 'desktop') {
       await page.evaluate(() => window.__genius.iniciar());
       await aguardarVez(page);
@@ -83,7 +74,7 @@ async function aguardarVez(page) {
       await page.screenshot({ path: path.join(SHOTS, 'pausa-' + vp.nome + '.png') });
       await page.click('#pausa-continuar');
       const seq = await page.evaluate(() => window.__genius.estado().sequencia);
-      await page.keyboard.press(String(((seq[0] + 1) % 4) + 1)); // tecla errada
+      await page.keyboard.press(String(((seq[0] + 1) % 4) + 1));
       await page.waitForSelector('#dlg-fim[open]', { timeout: 10000 });
       await page.screenshot({ path: path.join(SHOTS, 'fim-' + vp.nome + '.png') });
       await page.keyboard.press('Escape');
@@ -94,8 +85,8 @@ async function aguardarVez(page) {
     await ctx.close();
   }
 
-  // ---------------- TST-03: toque (tap) sem disparo duplo ----------------
   {
+    // TST-03: um toque conta uma unica jogada
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     await ctx.addInitScript(() => localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true, som: true })));
     const page = await ctx.newPage();
@@ -112,7 +103,6 @@ async function aguardarVez(page) {
     await ctx.close();
   }
 
-  // ---------------- TST-04: recorde persiste após recarregar; som desliga ----------------
   {
     const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
     const page = await ctx.newPage();
@@ -139,18 +129,16 @@ async function aguardarVez(page) {
     await ctx.close();
   }
 
-  // ---------------- TST-06: jogar só com teclado (Tab + Enter) ----------------
   {
     const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
     await ctx.addInitScript(() => localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true })));
     const page = await ctx.newPage();
     await page.goto(URL);
-    await page.keyboard.press('Tab'); // link "pular"
+    await page.keyboard.press('Tab');
     const pular = await page.evaluate(() => document.activeElement.className);
     await page.keyboard.press('Enter');
-    await page.keyboard.press('Enter'); // Enter na área do tabuleiro inicia
+    await page.keyboard.press('Enter');
     const seq = await aguardarVez(page);
-    // Navega por Tab até o quadrante certo e confirma com Espaço
     const alvoId = '#quadrante-' + ['verde', 'vermelho', 'amarelo', 'azul'][seq[0]];
     for (let i = 0; i < 12; i++) {
       await page.keyboard.press('Tab');
@@ -165,7 +153,7 @@ async function aguardarVez(page) {
     await ctx.close();
   }
 
-  // ---------------- Capturas: sequência sendo exibida (com narração) e multiplayer ----------------
+  // TST-07: multiplayer e capturas da sequencia sendo exibida
   for (const vp of [VIEWPORTS[0], VIEWPORTS[5]]) {
     const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, hasTouch: vp.touch, isMobile: vp.touch });
     await ctx.addInitScript(() => localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true, narrar: true, jogadores: 3 })));
@@ -175,7 +163,6 @@ async function aguardarVez(page) {
     await page.waitForSelector('.aceso.ativo', { timeout: 10000 });
     await page.waitForTimeout(120);
     await page.screenshot({ path: path.join(SHOTS, 'exibindo-' + vp.nome + '.png') });
-    // Jogador 1 acerta → vez do Jogador 2
     let seq = await aguardarVez(page);
     await page.keyboard.press(String(seq[0] + 1));
     await page.waitForFunction(() => window.__genius.estado().jogadorAtual === 1);
@@ -188,12 +175,10 @@ async function aguardarVez(page) {
     await ctx.close();
   }
 
-  // ---------------- TST-11: "Narrar cores" fala os nomes em voz alta ----------------
   {
     const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
     await ctx.addInitScript(() => {
       localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true, narrar: true }));
-      // Substitui o sintetizador por um "gravador" para o teste ouvir o que seria falado
       window.__falas = [];
       const falso = { speak: (u) => window.__falas.push(u.text), cancel: () => {}, getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null };
       Object.defineProperty(window, 'speechSynthesis', { value: falso, configurable: true });
@@ -210,7 +195,6 @@ async function aguardarVez(page) {
     await page.waitForTimeout(400);
     const nomes = ['Verde', 'Vermelho', 'Amarelo', 'Azul'];
     const falas = await page.evaluate(() => window.__falas);
-    // Na 3ª rodada, as últimas falas devem ser as 3 cores da sequência e "Sua vez"
     const esperado = seq.map((c) => nomes[c]).concat(['Sua vez']);
     const ok = JSON.stringify(falas.slice(-4)) === JSON.stringify(esperado);
     registrar('TST-11 narração por voz', ok, 'falou: ' + falas.slice(-4).join(', '));

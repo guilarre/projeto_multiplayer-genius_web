@@ -1,4 +1,4 @@
-# Integração contínua: roda os testes unitários a cada push e pull request
+# Integracao continua: roda os testes unitarios a cada push e pull request
 name: Testes
 on: [push, pull_request]
 jobs:

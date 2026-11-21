@@ -1,5 +1,4 @@
-// Fluxograma de funcionamento do Genius Web — gerar com:
-//   dot -Tpng -Gdpi=200 docs/fluxograma.dot -o docs/fluxograma.png
+// Gerar a imagem: dot -Tpng -Gdpi=170 docs/fluxograma.dot -o docs/fluxograma.png
 digraph Genius {
   graph [rankdir=TB, fontname="Helvetica", bgcolor="white", nodesep=0.45, ranksep=0.42, pad=0.3,
          label="Fluxograma de funcionamento — Genius Web (máquina de estados)", labelloc=t, fontsize=20];

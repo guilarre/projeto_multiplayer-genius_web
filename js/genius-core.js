@@ -1,24 +1,5 @@
-/* ============================================================================
- * GENIUS WEB — NÚCLEO DE LÓGICA (genius-core.js)
- * ----------------------------------------------------------------------------
- * Este arquivo contém SOMENTE regras do jogo, sem tocar no DOM, no áudio ou
- * em temporizadores. Por isso pode ser executado tanto no navegador quanto
- * no Node.js, onde é coberto pelos testes automatizados (tests/*.test.js).
- *
- * Princípio adotado: funções puras. Cada função recebe um "estado" e devolve
- * um NOVO estado (nunca altera o objeto recebido). Isso facilita o TDD: dado
- * um estado de entrada, o teste confere exatamente o estado de saída.
- *
- * Máquina de estados (campo `fase`):
- *   OCIOSO ──iniciarPartida──► EXIBINDO ──concluirExibicao──► ENTRADA
- *   ENTRADA ──acerto parcial──► ENTRADA
- *   ENTRADA ──sequência completa──► EXIBINDO (nova cor; próximo jogador)
- *   ENTRADA ──sequência no tamanho‑alvo──► VITORIA
- *   ENTRADA ──erro (1 jogador ou só resta 1)──► GAME_OVER
- *   ENTRADA ──erro (multiplayer, restam ≥2)──► EXIBINDO (mesma sequência)
- * ==========================================================================*/
+// Exporta para o Node.js (testes) e para o navegador
 (function (raiz, fabrica) {
-  // Padrão UMD: exporta via module.exports no Node e via window no navegador
   if (typeof module === 'object' && module.exports) {
     module.exports = fabrica();
   } else {
@@ -27,20 +8,12 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // --------------------------------------------------------------------------
-  // 1. CONSTANTES DE CONFIGURAÇÃO
-  // --------------------------------------------------------------------------
-
-  /** Índices fixos das cores. A ordem segue o tabuleiro (sentido horário). */
+  // Indices das cores: 0 Verde, 1 Vermelho, 2 Amarelo, 3 Azul
   const CORES = Object.freeze(['verde', 'vermelho', 'amarelo', 'azul']);
 
-  /** Nomes legíveis usados em mensagens e leitores de tela. */
   const NOMES_CORES = Object.freeze(['Verde', 'Vermelho', 'Amarelo', 'Azul']);
 
-  /**
-   * Níveis inspirados na chave "Skill" do Genius original (8, 14, 20 e 31
-   * sinais). `aceso`/`apagado` são os tempos (ms) de cada piscada no início.
-   */
+  // Niveis da chave Skill do Genius original: cores para vencer e tempos em ms
   const NIVEIS = Object.freeze({
     1: Object.freeze({ nome: 'Fácil', alvo: 8, aceso: 700, apagado: 300 }),
     2: Object.freeze({ nome: 'Médio', alvo: 14, aceso: 550, apagado: 250 }),
@@ -48,51 +21,33 @@
     4: Object.freeze({ nome: 'Expert', alvo: 31, aceso: 350, apagado: 150 })
   });
 
-  /**
-   * Limites mínimos de tempo. Um ciclo aceso+apagado nunca fica abaixo de
-   * 350 ms, ou seja, no máximo ~2,9 piscadas por segundo — abaixo do limite
-   * de 3 flashes/s da WCAG 2.3.1 (proteção contra crises fotossensíveis).
-   */
+  // Ciclo minimo de 350 ms: no maximo 2,86 piscadas por segundo (WCAG 2.3.1)
   const TEMPO_MIN_ACESO = 250;
   const TEMPO_MIN_APAGADO = 100;
 
-  /** Rodadas a partir das quais a velocidade aumenta (como no original). */
   const MARCOS_ACELERACAO = Object.freeze([5, 9, 13]);
 
   const MAX_JOGADORES = 4;
 
-  // --------------------------------------------------------------------------
-  // 2. FUNÇÕES AUXILIARES
-  // --------------------------------------------------------------------------
-
-  /** Garante que o nível é 1..4; qualquer valor inválido vira 1 (Fácil). */
   function normalizarNivel(nivel) {
     const n = Number(nivel);
     return NIVEIS[n] ? n : 1;
   }
 
-  /** Garante que o número de jogadores fica entre 1 e 4. */
   function normalizarJogadores(qtd) {
     const n = Math.floor(Number(qtd));
     if (!Number.isFinite(n) || n < 1) return 1;
     return Math.min(n, MAX_JOGADORES);
   }
 
-  /**
-   * Sorteia a próxima cor (0 a 3). O gerador `rng` é injetável para que os
-   * testes possam usar uma sequência previsível.
-   */
+  // Sorteia a proxima cor; o rng pode ser trocado nos testes
   function gerarProximaCor(rng) {
     const aleatorio = typeof rng === 'function' ? rng : Math.random;
     const indice = Math.floor(aleatorio() * CORES.length);
-    // Proteção caso um rng devolva exatamente 1.0
     return Math.min(Math.max(indice, 0), CORES.length - 1);
   }
 
-  /**
-   * Calcula o tempo de cada piscada para a rodada informada. A cada marco
-   * (5, 9, 13) o jogo fica 12% mais rápido, sem passar dos mínimos seguros.
-   */
+  // Acelera 12% nas rodadas 5, 9 e 13, sem passar dos tempos minimos
   function calcularIntervalos(nivel, rodada) {
     const cfg = NIVEIS[normalizarNivel(nivel)];
     const aceleracoes = MARCOS_ACELERACAO.filter(function (m) { return rodada >= m; }).length;
@@ -103,10 +58,7 @@
     };
   }
 
-  /**
-   * Procura, em sentido circular, o próximo jogador ainda ativo depois de
-   * `atual`. Se nenhum outro estiver ativo, devolve o próprio `atual`.
-   */
+  // Proximo jogador nao eliminado, em ordem circular
   function proximoJogadorAtivo(jogadores, atual) {
     const total = jogadores.length;
     for (let passo = 1; passo <= total; passo++) {
@@ -116,30 +68,16 @@
     return atual;
   }
 
-  /** Quantidade de jogadores que ainda não foram eliminados. */
   function contarAtivos(jogadores) {
     return jogadores.filter(function (j) { return j.ativo; }).length;
   }
 
-  /** Devolve o maior valor entre o recorde salvo e a pontuação atual. */
   function atualizarRecorde(recordeAtual, rodadasConcluidas) {
     const r = Number(recordeAtual) || 0;
     return Math.max(r, Number(rodadasConcluidas) || 0);
   }
 
-  // --------------------------------------------------------------------------
-  // 3. CRIAÇÃO E REINÍCIO DE ESTADO
-  // --------------------------------------------------------------------------
-
-  /**
-   * Estado inicial (tela "aguardando Iniciar").
-   * Variáveis de estado principais:
-   *  - sequencia: cores sorteadas pelo sistema (ex.: [0, 3, 1])
-   *  - indiceEntrada: quantas cores da sequência o jogador já acertou nesta vez
-   *  - fase: em qual etapa da máquina de estados o jogo está; o bloqueio de
-   *    cliques é derivado dela (só se aceita jogada na fase ENTRADA)
-   *  - jogadores / jogadorAtual: suporte a partidas de 1 a 4 pessoas
-   */
+  // Estado inicial; a fase controla quando o tabuleiro aceita jogadas
   function criarEstado(opcoes) {
     const op = opcoes || {};
     const nivel = normalizarNivel(op.nivel);
@@ -156,18 +94,16 @@
       indiceEntrada: 0,
       jogadores: jogadores,
       jogadorAtual: 0,
-      maiorSequencia: 0, // maior sequência completada na partida (base do recorde)
-      vencedor: null,    // id do jogador vencedor (multiplayer ou vitória solo)
-      ultimoErro: null   // { esperada, recebida } para explicar o erro ao usuário
+      maiorSequencia: 0,
+      vencedor: null,
+      ultimoErro: null
     };
   }
 
-  /** Recomeça do zero mantendo nível e número de jogadores. */
   function resetarJogo(estado) {
     return criarEstado({ nivel: estado.nivel, numJogadores: estado.jogadores.length });
   }
 
-  /** Inicia uma partida: sorteia a 1ª cor e passa para a fase de exibição. */
   function iniciarPartida(estado, rng) {
     const novo = resetarJogo(estado);
     novo.sequencia = [gerarProximaCor(rng)];
@@ -175,31 +111,16 @@
     return novo;
   }
 
-  /** Chamado pela interface quando termina de piscar a sequência. */
   function concluirExibicao(estado) {
     if (estado.fase !== 'EXIBINDO') return estado;
     return Object.assign({}, estado, { fase: 'ENTRADA', indiceEntrada: 0 });
   }
 
-  // --------------------------------------------------------------------------
-  // 4. VALIDAÇÃO DAS JOGADAS (coração do jogo)
-  // --------------------------------------------------------------------------
-
-  /** Cópia dos jogadores, para não alterar o array original. */
   function copiarJogadores(jogadores) {
     return jogadores.map(function (j) { return Object.assign({}, j); });
   }
 
-  /**
-   * Compara a cor tocada com a cor esperada na posição atual.
-   * Devolve { estado, resultado }, onde resultado é um destes códigos:
-   *  IGNORADA        – jogada fora da vez (ex.: durante a exibição) → bloqueio
-   *  ACERTO          – cor certa, mas a sequência ainda não terminou
-   *  RODADA_COMPLETA – sequência inteira certa; nova cor foi sorteada
-   *  VITORIA         – atingiu o tamanho‑alvo do nível
-   *  ELIMINADO       – multiplayer: jogador errou e saiu; partida continua
-   *  GAME_OVER       – fim de jogo por erro
-   */
+  // Compara a cor tocada com a esperada e devolve o novo estado e o resultado
   function validarJogada(estado, cor, rng) {
     if (estado.fase !== 'ENTRADA') {
       return { estado: estado, resultado: 'IGNORADA' };
@@ -209,13 +130,12 @@
     const jogadores = copiarJogadores(estado.jogadores);
     const atual = estado.jogadorAtual;
 
-    // ---- Caso 1: ERRO ------------------------------------------------------
+    // Erro: elimina o jogador; termina o jogo se restar no maximo um
     if (cor !== esperada) {
       const ultimoErro = { esperada: esperada, recebida: cor };
       jogadores[atual].ativo = false;
       const restantes = contarAtivos(jogadores);
 
-      // Solo, ou só sobrou um jogador → Game Over
       if (jogadores.length === 1 || restantes <= 1) {
         const sobrevivente = jogadores.find(function (j) { return j.ativo; });
         return {
@@ -229,7 +149,6 @@
         };
       }
 
-      // Multiplayer com ≥2 restantes: o próximo repete a MESMA sequência
       return {
         resultado: 'ELIMINADO',
         estado: Object.assign({}, estado, {
@@ -242,7 +161,7 @@
       };
     }
 
-    // ---- Caso 2: ACERTO PARCIAL -------------------------------------------
+    // Acerto parcial: avanca para a proxima cor
     const indice = estado.indiceEntrada + 1;
     if (indice < estado.sequencia.length) {
       return {
@@ -251,12 +170,11 @@
       };
     }
 
-    // ---- Caso 3: SEQUÊNCIA COMPLETA ---------------------------------------
+    // Sequencia completa: soma ponto, vence no alvo ou sorteia nova cor
     const tamanho = estado.sequencia.length;
-    jogadores[atual].pontos += 1; // 1 ponto por rodada concluída
+    jogadores[atual].pontos += 1;
     const maiorSequencia = Math.max(estado.maiorSequencia, tamanho);
 
-    // Atingiu o tamanho‑alvo do nível → vitória
     if (tamanho >= estado.alvo) {
       return {
         resultado: 'VITORIA',
@@ -270,7 +188,6 @@
       };
     }
 
-    // Ainda não: acrescenta uma cor e passa a vez
     return {
       resultado: 'RODADA_COMPLETA',
       estado: Object.assign({}, estado, {
@@ -284,21 +201,14 @@
     };
   }
 
-  // --------------------------------------------------------------------------
-  // 5. CONSULTAS PARA A INTERFACE
-  // --------------------------------------------------------------------------
-
-  /** Número da rodada exibido no placar (tamanho da sequência atual). */
   function rodadaAtual(estado) {
     return estado.sequencia.length;
   }
 
-  /** Verdadeiro quando a interface deve aceitar cliques/toques no tabuleiro. */
   function aceitaEntrada(estado) {
     return estado.fase === 'ENTRADA';
   }
 
-  /** Verdadeiro durante uma partida em andamento (pode ser pausada). */
   function partidaEmAndamento(estado) {
     return estado.fase === 'EXIBINDO' || estado.fase === 'ENTRADA';
   }

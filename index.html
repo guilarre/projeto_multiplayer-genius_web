@@ -2,13 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <!-- viewport-fit=cover: aproveita a tela inteira em celulares com "notch" -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Genius Web: jogo de memória com cores e sons. Funciona no computador, tablet e celular, com mouse, teclado ou toque.">
   <meta name="theme-color" content="#0d1218">
   <title>Genius Web — Jogo da Memória com Cores e Sons</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 16H2A14 14 0 0 1 16 2z' fill='%2318bd62'/%3E%3Cpath d='M16 16V2a14 14 0 0 1 14 14z' fill='%23f0444f'/%3E%3Cpath d='M16 16h14a14 14 0 0 1-14 14z' fill='%23268eff'/%3E%3Cpath d='M16 16v14A14 14 0 0 1 2 16z' fill='%23ffd23f'/%3E%3C/svg%3E">
-  <!-- Fonte JetBrains Mono (open-source) para o display; há fallback monoespaçado do sistema -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -16,10 +14,8 @@
 </head>
 
 <body data-fase="OCIOSO">
-  <!-- Link de pular: usuários de teclado/leitor de tela vão direto ao jogo -->
   <a class="pular-link" href="#area-tabuleiro">Pular para o tabuleiro</a>
 
-  <!-- ===================== CABEÇALHO ===================== -->
   <header class="topo">
     <h1 class="marca">Genius<span>Web</span></h1>
     <button id="btn-ajuda" class="btn btn-icone" type="button" aria-haspopup="dialog" aria-controls="dlg-ajuda">
@@ -28,11 +24,9 @@
   </header>
 
   <main class="layout">
-    <!-- ===================== PAINEL DE STATUS / PLACAR ===================== -->
     <section class="painel painel-status" aria-labelledby="titulo-placar">
       <h2 id="titulo-placar" class="sr-only">Placar</h2>
 
-      <!-- Mensagem principal. role=status + aria-live: leitores de tela anunciam cada mudança -->
       <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">
         Escolha o nível e toque em <strong>Iniciar</strong>.
       </p>
@@ -52,14 +46,11 @@
         </div>
       </dl>
 
-      <!-- Barra de progresso da vez do jogador (quantas cores já acertou) -->
       <div class="progresso" aria-hidden="true"><div id="barra-progresso" class="progresso-barra"></div></div>
 
-      <!-- Lista de jogadores (visível só no multiplayer) -->
       <ol id="lista-jogadores" class="lista-jogadores" aria-label="Jogadores" hidden></ol>
     </section>
 
-    <!-- ===================== TABULEIRO ===================== -->
     <section id="area-tabuleiro" class="area-tabuleiro" aria-label="Tabuleiro" tabindex="-1">
       <svg id="tabuleiro" class="tabuleiro" viewBox="0 0 408 408" role="group" aria-labelledby="tabuleiro-titulo" focusable="false" fill="none" xmlns="http://www.w3.org/2000/svg">
 <title id="tabuleiro-titulo">Tabuleiro do Genius com 4 botões coloridos</title>
@@ -282,7 +273,6 @@
             </svg>
     </section>
 
-    <!-- ===================== CONTROLES ===================== -->
     <section class="painel painel-controles" aria-labelledby="titulo-controles">
       <h2 id="titulo-controles" class="sr-only">Controles</h2>
 
@@ -318,7 +308,6 @@
       <p id="dica-config" class="dica">Nível (nº de cores para vencer) e jogadores podem ser trocados antes de iniciar.</p>
 
       <div class="alternancias">
-        <!-- aria-pressed indica o estado do botão-chave (ligado/desligado) -->
         <button id="btn-som" class="btn btn-chave" type="button" aria-pressed="true" aria-keyshortcuts="M">
           <span class="chave-indicador" aria-hidden="true"></span> Som
         </button>
@@ -335,13 +324,9 @@
     <p class="creditos">UNICAP · Robótica · Prof. Emmanuel Barreto · Adriano Arraujo, Guilherme Larré e Francis Lauriano · 2026</p>
   </footer>
 
-  <!-- Legenda acessível da sequência (modo "Narrar cores") -->
   <div id="legenda-cor" class="legenda-cor" aria-hidden="true"></div>
-  <!-- Região "assertive" para narração imediata das cores -->
   <div id="narrador" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-  <!-- ===================== DIÁLOGOS (MODAIS) ===================== -->
-  <!-- <dialog> nativo: prende o foco, fecha com Esc e é anunciado como modal -->
   <dialog id="dlg-ajuda" class="dialogo" aria-labelledby="ajuda-titulo">
     <h2 id="ajuda-titulo">Como jogar</h2>
     <ol class="passos">
