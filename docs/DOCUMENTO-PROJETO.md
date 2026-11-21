@@ -10,7 +10,7 @@ Modelo de documentação e entrega de projeto acadêmico. Disciplina de Design d
 | --- | --- |
 | Instituição / Disciplina | Universidade Católica de Pernambuco (UNICAP), Disciplina de Design de Interface e Usabilidade |
 | Professor(a) Responsável | Prof. Emmanuel Barreto |
-| Equipe de Alunos | \[Nome do Grupo\]: Adriano Araujo, Guilherme Larré e Franciscleide Lauriano |
+| Equipe de Alunos | \[Nome do Grupo\]: Adriano Araújo, Guilherme Larré e Franciscleide Lauriano |
 | Plataforma Exigida | Ambiente Web Responsivo (Desktops, Notebooks, Tablets e Celulares) com Link Online |
 | Link do Jogo | https://guilarre.github.io/projeto\_multiplayer-genius\_web/ |
 | Data Limite de Entrega | 12 de dezembro de 2026, Recife (PE) |
@@ -33,11 +33,11 @@ Este documento apresenta a especificação técnica, a arquitetura de interface,
 
 | Integrante | Nome Completo | Matrícula / RA | CPF | Data Nasc. | Papel no Projeto Web |
 | --- | --- | --- | --- | --- | --- |
-| Aluno 1 | Adriano Araujo | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Design de interface (tabuleiro SVG) / CSS responsivo |
-| Aluno 2 | Guilherme Larré ([github.com/guilarre](https://github.com/guilarre)) | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Líder / Lógica do jogo em JavaScript e repositório |
-| Aluno 3 | Franciscleide Lauriano ([github.com/francisLauriano](https://github.com/francisLauriano)) | 860720 | \[000.000.000-00\] | \[DD/MM/AAAA\] | Áudio web, acessibilidade, testes TDD e deploy |
+| Aluno 1 | Adriano Araújo | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Design de interface (tabuleiro SVG) |
+| Aluno 2 | Guilherme Larré ([github.com/guilarre](https://github.com/guilarre)) | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Líder / Lógica do jogo em JavaScript, testes TDD, repositório e deploy no GitHub Pages |
+| Aluno 3 | Franciscleide Lauriano ([github.com/francisLauriano](https://github.com/francisLauriano)) | 860720 | \[000.000.000-00\] | \[DD/MM/AAAA\] | CSS responsivo, áudio web, acessibilidade e testes TDD |
 
-**Breve apresentação da equipe e divisão de atividades:** a equipe partiu de conhecimentos de HTML, CSS e JavaScript, lógica de programação e noções de UX/UI. A primeira versão do jogo foi portada da lógica de um protótipo em Arduino (C++) e já tinha o tabuleiro SVG desenhado em ferramenta de design vetorial e o modo multiplayer. Na segunda fase, o trabalho foi dividido em três frentes que se integram pelo repositório Git: (1) lógica pura do jogo com testes unitários; (2) interface responsiva e acessível; (3) áudio, testes de interface em vários dispositivos e publicação no GitHub Pages. O código-fonte e o histórico de commits ficam no repositório de Guilherme Larré no GitHub.
+**Breve apresentação da equipe e divisão de atividades:** a equipe partiu de conhecimentos de HTML, CSS e JavaScript, lógica de programação e noções de UX/UI. A primeira versão do jogo foi portada da lógica de um protótipo em Arduino (C++) e já tinha o tabuleiro SVG desenhado em ferramenta de design vetorial e o modo multiplayer. Na segunda fase, o trabalho foi dividido em três frentes que se integram pelo repositório Git: (1) lógica do jogo, repositório e publicação no GitHub Pages, com Guilherme Larré; (2) CSS responsivo, áudio web e acessibilidade, com Franciscleide Lauriano; (3) design de interface e tabuleiro SVG, com Adriano Araújo. Os testes TDD ficaram com Guilherme Larré e Franciscleide Lauriano. O código-fonte e o histórico de commits ficam no repositório de Guilherme Larré no GitHub.
 
 ### 1.3 Diretrizes Obrigatórias da Solução Web
 

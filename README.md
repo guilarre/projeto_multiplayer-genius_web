@@ -300,7 +300,7 @@ O documento apresenta:
 
 Time responsável pelo desenvolvimento do projeto.
 
-| [<img src="https://github.com/USUARIO-ADRIANO.png" width="115"><br><sub>Adriano Arraujo</sub>](https://github.com/USUARIO-ADRIANO) | [<img src="https://github.com/guilarre.png" width="115"><br><sub>Guilherme Larré</sub>](https://github.com/guilarre) | [<img src="https://github.com/francisLauriano.png" width="115"><br><sub>Francis Lauriano</sub>](https://github.com/francisLauriano) |
+| [<img src="https://github.com/USUARIO-ADRIANO.png" width="115"><br><sub>Adriano Araújo</sub>](https://github.com/USUARIO-ADRIANO) | [<img src="https://github.com/guilarre.png" width="115"><br><sub>Guilherme Larré</sub>](https://github.com/guilarre) | [<img src="https://github.com/francisLauriano.png" width="115"><br><sub>Francis Lauriano</sub>](https://github.com/francisLauriano) |
 | :---: | :---: | :---: |
 
 ---
