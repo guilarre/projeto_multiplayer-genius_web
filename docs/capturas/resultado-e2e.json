@@ -1,0 +1,62 @@
+[
+  {
+    "id": "TST-02 celular 360x800",
+    "ok": true,
+    "detalhe": "tabuleiro 331px, scroll-x=false, alvos<44px=0, fonte mín=14px, erros=0"
+  },
+  {
+    "id": "TST-02 celular-390 390x844",
+    "ok": true,
+    "detalhe": "tabuleiro 359px, scroll-x=false, alvos<44px=0, fonte mín=14px, erros=0"
+  },
+  {
+    "id": "TST-02 celular-paisagem 800x360",
+    "ok": true,
+    "detalhe": "tabuleiro 281px, scroll-x=false, alvos<44px=0, fonte mín=14px, erros=0"
+  },
+  {
+    "id": "TST-02 tablet 768x1024",
+    "ok": true,
+    "detalhe": "tabuleiro 553px, scroll-x=false, alvos<44px=0, fonte mín=14px, erros=0"
+  },
+  {
+    "id": "TST-02 notebook 1366x768",
+    "ok": true,
+    "detalhe": "tabuleiro 568px, scroll-x=false, alvos<44px=0, fonte mín=14px, erros=0"
+  },
+  {
+    "id": "TST-02 desktop 1920x1080",
+    "ok": true,
+    "detalhe": "tabuleiro 760px, scroll-x=false, alvos<44px=0, fonte mín=14px, erros=0"
+  },
+  {
+    "id": "TST-03 toque",
+    "ok": true,
+    "detalhe": "um toque = uma jogada (pontos=1, sequência=2)"
+  },
+  {
+    "id": "TST-04 persistência",
+    "ok": true,
+    "detalhe": "recorde após F5 = 3, som = false"
+  },
+  {
+    "id": "TST-06 teclado",
+    "ok": true,
+    "detalhe": "skip-link ok, partida iniciada com Enter, jogada com Tab+Espaço, anel de foco 9px"
+  },
+  {
+    "id": "TST-07 multiplayer celular",
+    "ok": true,
+    "detalhe": "vez passou para o Jogador 2 de 3"
+  },
+  {
+    "id": "TST-07 multiplayer desktop",
+    "ok": true,
+    "detalhe": "vez passou para o Jogador 2 de 3"
+  },
+  {
+    "id": "TST-11 narração por voz",
+    "ok": true,
+    "detalhe": "falou: Vermelho, Vermelho, Verde, Sua vez"
+  }
+]
