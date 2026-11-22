@@ -52,7 +52,7 @@
     }
   }
   function salvarPreferencias() {
-    try { localStorage.setItem(CHAVE_ARMAZENAMENTO, JSON.stringify(prefs)); } catch (e) {  }
+    try { localStorage.setItem(CHAVE_ARMAZENAMENTO, JSON.stringify(prefs)); } catch (e) { }
   }
   const prefs = lerPreferencias();
 
@@ -112,18 +112,27 @@
     escolherVoz();
     if ('onvoiceschanged' in voz) voz.addEventListener('voiceschanged', escolherVoz);
   }
+  // Fala o texto e devolve uma Promise que termina quando a frase acaba
   function falar(texto) {
-    if (!prefs.narrar || !voz) return;
-    try {
-      voz.cancel();
-      const fala = new SpeechSynthesisUtterance(texto);
-      fala.lang = 'pt-BR';
-      if (vozPtBr) fala.voice = vozPtBr;
-      fala.rate = 1.15;
-      voz.speak(fala);
-    } catch (e) {  }
+    if (!prefs.narrar || !voz) return Promise.resolve();
+    return new Promise((pronto) => {
+      let feito = false;
+      const concluir = () => { if (!feito) { feito = true; clearTimeout(limite); pronto(); } };
+      // Limite de seguranca caso o navegador nao avise o fim da fala
+      const limite = setTimeout(concluir, 1200 + texto.length * 90);
+      try {
+        voz.cancel();
+        const fala = new SpeechSynthesisUtterance(texto);
+        fala.lang = 'pt-BR';
+        if (vozPtBr) fala.voice = vozPtBr;
+        fala.rate = 1.15;
+        fala.onend = concluir;
+        fala.onerror = concluir;
+        voz.speak(fala);
+      } catch (e) { concluir(); }
+    });
   }
-  function calarVoz() { if (voz) try { voz.cancel(); } catch (e) {  } }
+  function calarVoz() { if (voz) try { voz.cancel(); } catch (e) { } }
 
   function alternarSom() {
     prefs.som = !prefs.som;
@@ -153,6 +162,11 @@
     return new Promise((ok) => setTimeout(() => ok(minha === geracao), ms));
   }
   function cancelarEsperas() { geracao++; }
+  // Espera o tempo minimo e o fim das falas; devolve false se a partida foi pausada ou reiniciada
+  function esperarFalas(ms, ...falas) {
+    const minha = geracao;
+    return Promise.all([new Promise((ok) => setTimeout(ok, ms)), ...falas]).then(() => minha === geracao);
+  }
 
   function setStatus(html) { el.status.innerHTML = html; }
   function anunciar(texto) {
@@ -244,22 +258,24 @@
 
     const t = G.calcularIntervalos(estado.nivel, rodada);
     if (prefs.narrar) { t.aceso = Math.max(t.aceso, 650); t.apagado = Math.max(t.apagado, 250); }
+    let ultimaFala = Promise.resolve();
     for (let i = 0; i < estado.sequencia.length; i++) {
       const cor = estado.sequencia[i];
       acender(cor, t.aceso);
       if (prefs.narrar) {
         mostrarLegenda((i + 1) + ' · ' + nomeCor(cor));
-        falar(G.NOMES_CORES[cor]);
+        ultimaFala = falar(G.NOMES_CORES[cor]);
       }
       if (!(await esperar(t.aceso + t.apagado))) { esconderLegenda(); return; }
     }
     esconderLegenda();
+    if (!(await esperarFalas(0, ultimaFala))) return;
 
     estado = G.concluirExibicao(estado);
     lcd('RODADA ' + dois(rodada) + '/' + dois(estado.alvo), 'SUA VEZ!');
     setStatus(quem + '<strong>Sua vez!</strong> Repita ' + (rodada > 1 ? 'as ' + rodada + ' cores.' : 'a cor.'));
     render();
-    if (await esperar(t.apagado)) falar((multiplayer() ? 'Jogador ' + jogadorDaVez() + ', sua vez' : 'Sua vez'));
+    falar(multiplayer() ? 'Jogador ' + jogadorDaVez() + ', sua vez' : 'Sua vez');
   }
 
   // Trata cada toque, clique ou tecla em um quadrante
@@ -286,11 +302,11 @@
 
       case 'RODADA_COMPLETA':
         acender(cor, 220);
-        falar(G.NOMES_CORES[cor] + '. Acertou!');
+        const falaAcerto = falar(G.NOMES_CORES[cor] + '. Acertou!');
         lcd('ACERTOU!', '+1 COR');
         setStatus('Acertou! ' + (multiplayer() ? 'Agora é a vez do Jogador ' + jogadorDaVez() + '.' : 'Próxima rodada…'));
         render();
-        if (await esperar(900)) exibirSequencia();
+        if (await esperarFalas(900, falaAcerto)) exibirSequencia();
         break;
 
       case 'VITORIA':
@@ -311,13 +327,13 @@
         render();
         if (!(await esperar(700))) return;
         acender(erro.esperada, 700);
-        falar('Errou. A cor certa era ' + G.NOMES_CORES[erro.esperada]);
+        const falaErro = falar('Errou. A cor certa era ' + G.NOMES_CORES[erro.esperada]);
         if (r.resultado === 'ELIMINADO') {
           setStatus(msg + ' Jogador eliminado. Próximo: Jogador ' + jogadorDaVez() + '.');
-          if (await esperar(1800)) exibirSequencia();
+          if (await esperarFalas(1800, falaErro)) exibirSequencia();
         } else {
           setStatus(msg);
-          if (await esperar(1000)) finalizar();
+          if (await esperarFalas(1000, falaErro)) finalizar();
         }
         break;
       }
@@ -369,7 +385,7 @@
   }
 
   // Pausa cancela a exibicao; ao continuar, a sequencia se repete
-  function pausar() {
+  function pausar(abrirDialogoPausa = true) {
     if (pausado || !G.partidaEmAndamento(estado) || dialogoAberto()) return;
     pausado = true;
     cancelarEsperas();
@@ -380,7 +396,13 @@
       (estado.fase === 'ENTRADA' && estado.indiceEntrada > 0 ? ' — você já repetiu ' + estado.indiceEntrada + ' cor(es).' : '.');
     lcd('PAUSADO', '');
     render();
-    abrirDialogo(el.dlgPausa);
+    if (abrirDialogoPausa) abrirDialogo(el.dlgPausa);
+  }
+  // Ajuda durante a partida: pausa sem o dialogo de pausa e mostra as instrucoes
+  function abrirAjuda() {
+    if (G.partidaEmAndamento(estado) && !pausado) pausar(false);
+    fecharDialogo(el.dlgPausa);
+    abrirDialogo(el.dlgAjuda);
   }
 
   function continuar() {
@@ -452,7 +474,7 @@
     if (prefs.narrar) falar('Narração das cores ligada');
     else { calarVoz(); anunciar('Narração das cores desligada.'); }
   });
-  el.btnAjuda.addEventListener('click', () => { if (G.partidaEmAndamento(estado)) pausar(); if (!dialogoAberto()) abrirDialogo(el.dlgAjuda); });
+  el.btnAjuda.addEventListener('click', abrirAjuda);
 
   el.selNivel.addEventListener('change', () => {
     prefs.nivel = Number(el.selNivel.value);
@@ -468,6 +490,7 @@
   });
 
   $('#pausa-continuar').addEventListener('click', continuar);
+  $('#pausa-ajuda').addEventListener('click', abrirAjuda);
   $('#pausa-reiniciar').addEventListener('click', iniciar);
   $('#pausa-encerrar').addEventListener('click', encerrar);
   el.dlgPausa.addEventListener('cancel', (e) => { e.preventDefault(); continuar(); });
@@ -478,7 +501,11 @@
   document.querySelectorAll('[data-fechar]').forEach((b) => {
     b.addEventListener('click', () => fecharDialogo(b.closest('dialog')));
   });
-  el.dlgAjuda.addEventListener('close', () => { prefs.viuAjuda = true; salvarPreferencias(); });
+  el.dlgAjuda.addEventListener('close', () => {
+    prefs.viuAjuda = true;
+    salvarPreferencias();
+    if (pausado) abrirDialogo(el.dlgPausa);
+  });
 
   [el.dlgAjuda, el.dlgFim].forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) fecharDialogo(d); }));
 

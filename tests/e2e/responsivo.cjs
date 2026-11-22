@@ -193,8 +193,17 @@ async function aguardarVez(page) {
     const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
     await ctx.addInitScript(() => {
       localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true, narrar: true }));
-      window.__falas = [];
-      const falso = { speak: (u) => window.__falas.push(u.text), cancel: () => {}, getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null };
+      // Voz simulada: cada frase dura 500 ms e registra se foi cortada por outra
+      window.__falas = []; window.__log = []; let atual = null;
+      const falso = {
+        speak: (u) => {
+          const r = { texto: u.text, cortada: false };
+          window.__falas.push(u.text); window.__log.push(r); atual = { r, u };
+          r.t = setTimeout(() => { atual = null; if (u.onend) u.onend(); }, 500);
+        },
+        cancel: () => { if (atual) { clearTimeout(atual.r.t); atual.r.cortada = true; const u = atual.u; atual = null; if (u.onerror) u.onerror({}); } },
+        getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null
+      };
       Object.defineProperty(window, 'speechSynthesis', { value: falso, configurable: true });
     });
     const page = await ctx.newPage();
@@ -212,7 +221,33 @@ async function aguardarVez(page) {
     const esperado = seq.map((c) => nomes[c]).concat(['Sua vez']);
     const ok = JSON.stringify(falas.slice(-4)) === JSON.stringify(esperado);
     registrar('TST-11 narração por voz', ok, 'falou: ' + falas.slice(-4).join(', '));
+    // TST-12: "Acertou!" termina antes da proxima sequencia comecar
+    const acertos = await page.evaluate(() => window.__log.filter((r) => r.texto.endsWith('Acertou!')));
+    const ok12 = acertos.length === 2 && acertos.every((r) => !r.cortada);
+    registrar('TST-12 narracao sem sobreposicao', ok12, acertos.length + ' frases "Acertou!", cortadas: ' + acertos.filter((r) => r.cortada).length);
+    if (!ok12) falhas++;
     if (!ok) { falhas++; console.log(falas); }
+    await ctx.close();
+  }
+
+  // TST-13: "Como jogar" durante a partida mostra as instrucoes e depois volta para a pausa
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+    await ctx.addInitScript(() => localStorage.setItem('geniusweb:v1', JSON.stringify({ viuAjuda: true })));
+    const page = await ctx.newPage();
+    await page.goto(URL);
+    await page.click('#btn-iniciar');
+    await aguardarVez(page);
+    await page.click('#btn-ajuda');
+    const durante = await page.evaluate(() => ({ ajuda: document.querySelector('#dlg-ajuda').open, pausa: document.querySelector('#dlg-pausa').open, fase: document.body.dataset.fase }));
+    await page.click('#dlg-ajuda [data-fechar]');
+    await page.waitForSelector('#dlg-pausa[open]', { timeout: 3000 }).catch(() => {});
+    const depois = await page.evaluate(() => ({ ajuda: document.querySelector('#dlg-ajuda').open, pausa: document.querySelector('#dlg-pausa').open }));
+    await page.click('#pausa-ajuda');
+    const pelaPausa = await page.evaluate(() => document.querySelector('#dlg-ajuda').open);
+    const ok = durante.ajuda && !durante.pausa && durante.fase === 'PAUSADO' && !depois.ajuda && depois.pausa && pelaPausa;
+    registrar('TST-13 ajuda durante a partida', ok, 'ajuda aberta e jogo pausado; ao fechar volta a pausa; botao "Como jogar" na pausa funciona');
+    if (!ok) { falhas++; console.log(durante, depois, pelaPausa); }
     await ctx.close();
   }
 

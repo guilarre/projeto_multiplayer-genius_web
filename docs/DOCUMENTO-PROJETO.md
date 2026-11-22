@@ -34,10 +34,10 @@ Este documento apresenta a especificação técnica, a arquitetura de interface,
 | Integrante | Nome Completo | Matrícula / RA | CPF | Data Nasc. | Papel no Projeto Web |
 | --- | --- | --- | --- | --- | --- |
 | Aluno 1 | Adriano Araújo | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Design de interface (tabuleiro SVG) |
-| Aluno 2 | Guilherme Larré ([github.com/guilarre](https://github.com/guilarre)) | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Líder / Lógica do jogo em JavaScript, testes TDD e deploy no GitHub Pages |
-| Aluno 3 | Franciscleide Lauriano ([github.com/francisLauriano](https://github.com/francisLauriano)) | 860720 | \[000.000.000-00\] | \[DD/MM/AAAA\] | CSS responsivo, áudio web, acessibilidade e testes TDD |
+| Aluno 2 | Guilherme Larré ([github.com/guilarre](https://github.com/guilarre)) | \[000000000\] | \[000.000.000-00\] | \[DD/MM/AAAA\] | Líder / Lógica do jogo em JavaScript, testes TDD, repositório e deploy no GitHub |
+| Aluno 3 | Franciscleide Lauriano ([github.com/francisLauriano](https://github.com/francisLauriano)) | 860720 | \[000.000.000-00\] | \[DD/MM/AAAA\] | CSS responsivo, áudio web, acessibilidade, testes TDD e relatório técnico |
 
-**Breve apresentação da equipe e divisão de atividades:** a equipe partiu de conhecimentos de HTML, CSS e JavaScript, lógica de programação e noções de UX/UI. A primeira versão do jogo foi portada da lógica de um protótipo em Arduino (C++) e já tinha o tabuleiro SVG desenhado em ferramenta de design vetorial e o modo multiplayer. Na segunda fase, o trabalho foi dividido em três frentes que se integram pelo repositório Git: (1) lógica do jogo, repositório e publicação no GitHub Pages, com Guilherme Larré; (2) CSS responsivo, áudio web e acessibilidade, com Franciscleide Lauriano; (3) design de interface e tabuleiro SVG, com Adriano Araújo. Os testes TDD ficaram com Guilherme Larré e Franciscleide Lauriano. O código-fonte e o histórico de commits ficam no repositório de Guilherme Larré no GitHub.
+**Breve apresentação da equipe e divisão de atividades:** a equipe partiu de conhecimentos de HTML, CSS e JavaScript, lógica de programação e noções de UX/UI. A primeira versão do jogo foi portada da lógica de um protótipo em Arduino (C++) e já tinha o tabuleiro SVG desenhado em ferramenta de design vetorial e o modo multiplayer. Na segunda fase, o trabalho foi dividido em três frentes que se integram pelo repositório Git: (1) lógica do jogo, repositório e deploy no GitHub, com Guilherme Larré; (2) CSS responsivo, áudio web, acessibilidade e relatório técnico, com Franciscleide Lauriano; (3) design de interface e tabuleiro SVG, com Adriano Araújo. Os testes TDD ficaram com Guilherme Larré e Franciscleide Lauriano. O código-fonte e o histórico de commits ficam no repositório de Guilherme Larré no GitHub.
 
 ### 1.3 Diretrizes Obrigatórias da Solução Web
 
@@ -127,7 +127,7 @@ Os requisitos seguem a IEEE 830-1998. Cada requisito tem identificador único, p
 | RF-06 | Níveis e Velocidade | Oferecer 4 níveis (alvo de 8, 14, 20 e 31 cores, como a chave Skill original), acelerando 12% nas rodadas 5, 9 e 13. | Média (Should) | Ao completar o alvo, o jogo declara vitória. Intervalos diminuem nos marcos. | TST-05, TST-08 |
 | RF-07 | Pausa | Pausar por botão, tecla P/Esc ou troca de aba, com as opções Continuar, Reiniciar e Encerrar. | Média (Should) | Exibição interrompida em ≤ 50 ms. Ao continuar, a sequência é reapresentada. | TST-06 |
 | RF-08 | Explicação do Erro | Ao errar, informar qual cor era a correta e qual foi tocada, e acender a cor correta. | Média (Should) | Mensagem do tipo "A cor certa era Azul (4); você tocou Vermelho (2)". | TST-01 |
-| RF-09 | Ajuda e Atalhos | Exibir "Como jogar" na primeira visita e pelo botão "?", com regras, tabela de atalhos e dicas de acessibilidade. | Média (Should) | Abre automaticamente só na 1ª visita e fecha com Esc ou Entendi. | TST-06 |
+| RF-09 | Ajuda e Atalhos | Exibir "Como jogar" na primeira visita e pelo botão "?", com regras, tabela de atalhos e dicas de acessibilidade. | Média (Should) | Abre automaticamente só na 1ª visita e fecha com Esc ou Entendi. Durante a partida, pausa o jogo e, ao fechar, volta ao diálogo de pausa. | TST-06 |
 
 **2. Requisitos Não-Funcionais (RNF):**
 
@@ -156,7 +156,7 @@ Os requisitos seguem a IEEE 830-1998. Cada requisito tem identificador único, p
 
 ### 2.5 Quest 5: Validação e Testes Orientados a TDD
 
-Todos os 24 testes automatizados passam: 12 unitários da lógica e 12 verificações de interface em 6 tamanhos de tela (execução de 20/11/2026). Faltam apenas as duas verificações manuais em aparelho real e com leitor de tela, marcadas como Pendente.
+Todos os 36 testes automatizados passam: 12 unitários da lógica e 24 verificações de interface em 8 tamanhos de tela (execução de 22/11/2026). Faltam apenas as duas verificações manuais em aparelho real e com leitor de tela, marcadas como Pendente.
 
 O ciclo TDD foi aplicado assim:
 
@@ -167,7 +167,7 @@ O ciclo TDD foi aplicado assim:
 | ID Teste | Req. Alvo | Ambiente | Procedimento de Teste (Test-First) | Resultado Esperado para Aprovação | Resultado Obtido |
 | --- | --- | --- | --- | --- | --- |
 | TST-01 | RF-03, RF-08 | Teste unitário (Node.js) | Simular sequência \[Verde, Azul\] e enviar jogadas \[Verde, Vermelho\]. | `validarJogada` retorna ACERTO e depois GAME\_OVER, e registra `ultimoErro = {esperada: Azul, recebida: Vermelho}`. | Aprovado |
-| TST-02 | RNF-01, RNF-03, RNF-04 | Playwright (Chrome) multi-tela | Abrir em 360×800, 390×844, 800×360 (paisagem), 768×1024, 1366×768 e 1920×1080. Medir rolagem horizontal, tabuleiro, áreas de toque e erros de console. | Tabuleiro quadrado, centralizado e inteiro. Sem scroll horizontal, nenhum controle < 44 px e zero erros de console. | Aprovado: tabuleiro de 331, 359, 281, 553, 568 e 760 px, sem scroll-x |
+| TST-02 | RNF-01, RNF-03, RNF-04 | Playwright (Chrome) multi-tela | Abrir em 360×800, 390×844, 800×360 (paisagem), 768×1024, 1366×768, 1920×1080, 1536×695 e 1280×550 (Windows com zoom de 125% e 150%). Medir rolagem horizontal, tabuleiro, áreas de toque, erros de console e se o rodapé é alcançável. | Tabuleiro quadrado, centralizado e inteiro. Sem scroll horizontal, nenhum controle < 44 px e zero erros de console. | Aprovado: tabuleiro de 331, 359, 281, 553, 568 e 760 px, sem scroll-x |
 | TST-03 | RNF-02, RF-02 | Toque emulado (Playwright) e smartphone real | Tocar Iniciar e depois o quadrante correto uma vez. No celular real, tocar rapidamente os 4 quadrantes pelo link online. | Cada toque acende o botão e emite o som, contando exatamente uma jogada, sem disparo duplo. | Emulado: aprovado (1 toque = 1 ponto). Celular real: \[Pendente, a equipe executa\] |
 | TST-04 | RF-04, RTEC-03 | Navegador web | Completar 3 rodadas, errar, desligar o Som e atualizar a página (F5). | Recorde permanece 3 e Som permanece desligado (`aria-pressed=false`, volume geral 0). | Aprovado |
 | TST-05 | RF-01, RF-06 | Teste unitário (Node.js) | Jogar 20 rodadas corretas no nível Difícil. Gerar duas sequências de 20 cores e compará-las. | A sequência cresce exatamente 1 cor por rodada e a 20ª retorna VITORIA. As duas sequências são diferentes. | Aprovado |
@@ -177,6 +177,8 @@ O ciclo TDD foi aplicado assim:
 | TST-09 | RNF-07 | Medição de arquivos | Somar os tamanhos de `index.html`, `style.css` e dos scripts. | Menos de 100 KB sem compressão e nenhum arquivo de mídia. | Aprovado (81 KB) |
 | TST-10 | RNF-04, RNF-06 | Script de contraste e leitor de tela | Calcular o contraste das cores do tema. Navegar com NVDA (Windows), TalkBack (Android) e VoiceOver (iOS). | Texto ≥ 4,5:1. O leitor anuncia "Verde, tecla 1 ou Q, botão", rodada, vez e erro. | Contraste: aprovado (texto 16,7:1; secundário 10,1:1; mínimo 6,9:1). Leitor de tela: \[Pendente, a equipe executa\] |
 | TST-11 | RNF-06, RF-02 | Playwright (síntese de voz simulada) | Ligar "Narrar cores", jogar 2 rodadas e registrar tudo o que o sintetizador de voz recebe na 3ª rodada. | As falas são as cores da sequência, na ordem, seguidas de "Sua vez". | Aprovado (ex.: "Vermelho, Vermelho, Verde, Sua vez") |
+| TST-12 | RNF-06, RF-02 | Playwright (síntese de voz simulada) | Com "Narrar cores" ligado, completar 2 rodadas com a voz simulada levando 500 ms por frase. | Nenhuma frase "Acertou!" é cortada pela próxima sequência: o jogo espera a frase terminar. | Aprovado (0 de 2 frases cortadas) |
+| TST-13 | RF-09, RF-07 | Playwright | Durante a partida, clicar em "? Como jogar", fechar a ajuda e abrir "Como jogar" pelo diálogo de pausa. | As instruções aparecem e o jogo fica pausado. Ao fechar, volta o diálogo de pausa, e o botão "Como jogar" da pausa também abre as instruções. | Aprovado |
 
 ### 2.6 Avaliação pelas Heurísticas de Nielsen e Acessibilidade (WCAG 2.2)
 
@@ -249,8 +251,8 @@ A Figura 3 usa capturas reais da aplicação geradas pelos testes automatizados.
 | EL-07 | Botão Pausar | Botão de ação | Abre o diálogo de pausa. Desabilitado fora da partida. | Ao lado do Iniciar no celular e tablet, e abaixo dele no desktop. |
 | EL-08 | Seletores Nível e Jogadores | Controles auxiliares (`select` com `label`) | Nível: Fácil (8), Médio (14), Difícil (20) ou Expert (31). Jogadores: 1 a 4. Travados durante a partida e lembrados entre visitas. | Dois campos lado a lado no celular, sem sobrepor o tabuleiro, e empilhados no desktop. Altura de 48 px. |
 | EL-09 | Chaves Som e Narrar cores | Botões-chave (`aria-pressed`) | Som liga e desliga o áudio (tecla M). Narrar fala em voz alta (Web Speech API, voz em português) e mostra o nome de cada cor da sequência, a cor tocada, "Sua vez" e o erro, deixando a sequência um pouco mais lenta. Indicador verde quando ligado. | Lado a lado no celular e empilhadas no desktop. |
-| EL-10 | Botão "? Como jogar" e diálogo de ajuda | Botão + diálogo modal (`dialog`) | Regras em 4 passos, tabela de atalhos, multiplayer e dicas de acessibilidade. Abre sozinho só na primeira visita e fecha com Esc. | Canto superior direito em todos os tamanhos. O diálogo ocupa 92% da largura no celular (máximo de 520 px) e rola se for maior que a tela. |
-| EL-11 | Diálogos de Pausa e de Fim de jogo | Modais (`dialog`) | Pausa: Continuar, Reiniciar ou Encerrar (Esc continua). Fim: resultado, novo recorde, ranking e Jogar novamente (recebe o foco). | Centralizados sobre fundo escurecido. Botões em coluna de largura total na pausa. |
+| EL-10 | Botão "? Como jogar" e diálogo de ajuda | Botão + diálogo modal (`dialog`) | Regras em 4 passos, tabela de atalhos, multiplayer e dicas de acessibilidade. Abre sozinho só na primeira visita e fecha com Esc. Durante a partida, pausa o jogo e, ao fechar, volta à pausa. | Canto superior direito em todos os tamanhos. O diálogo ocupa 92% da largura no celular (máximo de 520 px) e rola se for maior que a tela. |
+| EL-11 | Diálogos de Pausa e de Fim de jogo | Modais (`dialog`) | Pausa: Continuar, Como jogar, Reiniciar ou Encerrar (Esc continua). Fim: resultado, novo recorde, ranking e Jogar novamente (recebe o foco). | Centralizados sobre fundo escurecido. Botões em coluna de largura total na pausa. |
 | EL-12 | Link "Pular para o tabuleiro" e rodapé de atalhos | Navegação acessível | O link aparece só ao receber foco pelo Tab. O rodapé lista as teclas de atalho. | Rodapé centralizado. No celular em paisagem os créditos são ocultados para caber o tabuleiro. |
 
 ## 4. Acesso ao Jogo Online e Código-Fonte Comentado

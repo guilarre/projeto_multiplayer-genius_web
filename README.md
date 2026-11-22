@@ -239,7 +239,7 @@ npm run test:e2e    # responsividade, toque, teclado, recorde e multiplayer
 ```
 
 - **Testes unitários:** 12 testes da lógica do jogo (sequência, validação, multiplayer, velocidade, recorde);
-- **Testes de interface:** 11 verificações em 6 tamanhos de tela, de **360×800** a **1920×1080**;
+- **Testes de interface:** 24 verificações em 8 tamanhos de tela, de **360×800** a **1920×1080**, incluindo Windows com zoom de 125% e 150%;
 - **Integração contínua:** os testes unitários rodam a cada push pelo GitHub Actions.
 
 ---
