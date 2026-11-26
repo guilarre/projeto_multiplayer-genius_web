@@ -7,7 +7,7 @@
   <img src="http://img.shields.io/static/v1?label=Node.js&message=18%2B&color=339933&style=for-the-badge&logo=node.js"/>
   <img src="http://img.shields.io/static/v1?label=Playwright&message=E2E&color=2EAD33&style=for-the-badge&logo=playwright"/>
   <img src="http://img.shields.io/static/v1?label=GitHub&message=Pages&color=181717&style=for-the-badge&logo=github"/>
-  <img src="http://img.shields.io/static/v1?label=STATUS&message=EM%20FINALIZA%C3%87%C3%83O&color=yellow&style=for-the-badge"/>
+  <img src="http://img.shields.io/static/v1?label=STATUS&message=FINALIZADO&color=green&style=for-the-badge"/>
 </p>
 
 > Status do Projeto: :heavy_check_mark: (concluído) | :warning: (em desenvolvimento) | :x: (não iniciado)
@@ -17,8 +17,8 @@
 | Jogo web responsivo e acessível | :heavy_check_mark: |
 | Testes automatizados (unitários e de interface) | :heavy_check_mark: |
 | Documentação do projeto (modelo UNICAP) | :heavy_check_mark: |
-| Publicação no GitHub Pages | :warning: |
-| Testes em celular real e com leitor de tela | :warning: |
+| Publicação no GitHub Pages | :heavy_check_mark: |
+| Testes em celular real e com leitor de tela | :heavy_check_mark: |
 
 ---
 
